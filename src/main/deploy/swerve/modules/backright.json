@@ -6,8 +6,7 @@
   "absoluteEncoderOffset": 0,
   "drive": {
     "type": "krakenx60",
-    "id": 2,
-    "canbus": null
+    "id": 2
   },
   "inverted": {
     "drive": true,
@@ -15,13 +14,11 @@
   },
   "angle": {
     "type": "sparkmax_neo",
-    "id": 1,
-    "canbus": null
+    "id": 1
   },
   "encoder": {
     "type": "attached",
-    "id": 0,
-    "canbus": null
+    "id": 0
   },
   "absoluteEncoderInverted": true
 }
