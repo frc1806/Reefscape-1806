@@ -1,4 +1,4 @@
-package frc.robot.commands.swervedrive.drivebase.intakes;
+package frc.robot.subsystems.intakes;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
