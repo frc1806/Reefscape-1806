@@ -360,7 +360,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
     {
         double armPosition = mIntakeArmMotor.getAbsoluteEncoder().getPosition();
         //Check for faults
-        if(armPosition> getMaximumEverReasonableAngle() || armPosition < getMinimumEverReasonableAngle())
+        if(mArmState != MotorizedIntakeArmState.kDisabled && (armPosition> getMaximumEverReasonableAngle() || armPosition < getMinimumEverReasonableAngle()))
         {
             mArmState = MotorizedIntakeArmState.kDisabled; //kill it, live to play another match unless it's already FUBAR. At least we might save the motor.
             System.out.println("!!INTAKE FAULT!! Intake:" + getIntakeName() + " has achieved an arm angle of:" + armPosition + " . Disabling.");
