@@ -89,13 +89,13 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         intakeRollerCurrentConfigs.withSupplyCurrentLimit(getIntakeRollerSupplyCurrentLimit());
         intakeRollerCurrentConfigs.withStatorCurrentLimit(getIntakeRollerStatorCurrentLimit());
 
-        TalonFXConfiguration rollerConfiguration = new TalonFXConfiguration();
-        rollerConfiguration.withCurrentLimits(intakeRollerCurrentConfigs);
+        mIntakeRollerConfig = new TalonFXConfiguration();
+        mIntakeRollerConfig.withCurrentLimits(intakeRollerCurrentConfigs);
         MotorOutputConfigs rollerOutputConfig = new MotorOutputConfigs();
         rollerOutputConfig.withInverted(isIntakeRollerInverted()? InvertedValue.Clockwise_Positive:InvertedValue.CounterClockwise_Positive);
         rollerOutputConfig.withNeutralMode(NeutralModeValue.Coast);
-        rollerConfiguration.withMotorOutput(rollerOutputConfig);
-        intakeRollerConfigurator.apply(rollerConfiguration);
+        mIntakeRollerConfig.withMotorOutput(rollerOutputConfig);
+        intakeRollerConfigurator.apply(mIntakeRollerConfig);
     }
 
     /**
