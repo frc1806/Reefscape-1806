@@ -23,6 +23,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -102,6 +103,12 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
      * @return
      */
     protected abstract boolean isIntakeEnabled();
+
+    /**
+     * Get the name of this string for use on the dashboard/debugging.
+     * @return
+     */
+    protected abstract String getIntakeName();
 
     /*
      * HARDWARE
@@ -356,6 +363,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         if(armPosition> getMaximumEverReasonableAngle() || armPosition < getMinimumEverReasonableAngle())
         {
             mArmState = MotorizedIntakeArmState.kDisabled; //kill it, live to play another match unless it's already FUBAR. At least we might save the motor.
+            System.out.println("!!INTAKE FAULT!! Intake:" + getIntakeName() + " has achieved an arm angle of:" + armPosition + " . Disabling.");
         }
         
 
@@ -402,6 +410,10 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
                 mIntakeArmMotor.stopMotor();
             break;
         }
+
+        //Update smart dashbaord
+        SmartDashboard.putNumber(getIntakeName() + "/arm position", armPosition);
+        SmartDashboard.putString(getIntakeName() + "/state", mArmState.name());
     }
 
 }
