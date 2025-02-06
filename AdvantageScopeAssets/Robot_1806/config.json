@@ -1,0 +1,47 @@
+{
+    "name": "S.W.A.T. 2025 To Be Named",
+	"disableSimplification": false,
+    "rotations": [
+        {
+            "axis": "z",
+            "degrees": 90
+			
+        },
+		{
+			"axis": "x",
+			"degrees": 180
+		},
+		{
+			"axis": "y",
+			"degrees": 90
+		}
+    ],
+    "position": [
+        0.443865,
+        0.443865,
+        0
+    ],
+    "cameras": [
+        {
+            "name": "up",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degress": 90
+                }
+            ],
+            "position": [
+                0,
+                0,
+                1
+            ],
+            "resolution": [
+                1280,
+                800
+            ],
+            "fov": 63.3
+        }
+    ],
+    "components": [
+    ]
+}
