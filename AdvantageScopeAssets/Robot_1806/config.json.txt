@@ -1,0 +1,9 @@
+{
+  "name": "1806 2025", // Unique name, required for all asset types
+  "rotations": [
+  {"axis" : "z", "degrees":180}
+  ], // Sequence of rotations along the x, y, and z axes
+  "position": [0, 0, 0], // Position offset in meters, applied after rotation
+  "cameras": [],
+  "components": [] // See "Articulated Components"
+}

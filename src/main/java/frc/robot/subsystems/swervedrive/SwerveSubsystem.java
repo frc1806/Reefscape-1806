@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.ReefscapePointsHelper;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
@@ -239,30 +240,15 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
   /**
-   * Get the distance to the speaker.
-   *
-   * @return Distance to speaker in meters.
-   */
-  public double getDistanceToSpeaker()
-  {
-    int allianceAprilTag = DriverStation.getAlliance().get() == Alliance.Blue ? 7 : 4;
-    // Taken from PhotonUtils.getDistanceToPose
-    Pose3d speakerAprilTagPose = aprilTagFieldLayout.getTagPose(allianceAprilTag).get();
-    return getPose().getTranslation().getDistance(speakerAprilTagPose.toPose2d().getTranslation());
-  }
-
-  /**
    * Get the yaw to aim at the speaker.
    *
    * @return {@link Rotation2d} of which you need to achieve.
    */
-  public Rotation2d getSpeakerYaw()
+  public Rotation2d getReefYaw()
   {
-    int allianceAprilTag = DriverStation.getAlliance().get() == Alliance.Blue ? 7 : 4;
     // Taken from PhotonUtils.getYawToPose()
-    Pose3d        speakerAprilTagPose = aprilTagFieldLayout.getTagPose(allianceAprilTag).get();
-    Translation2d relativeTrl         = speakerAprilTagPose.toPose2d().relativeTo(getPose()).getTranslation();
-    return new Rotation2d(relativeTrl.getX(), relativeTrl.getY()).plus(swerveDrive.getOdometryHeading());
+    Translation2d diff = ReefscapePointsHelper.getCenterOfReef().minus(getPose().getTranslation());
+    return new Rotation2d(diff.getX(), diff.getY());
   }
 
   /**
@@ -271,17 +257,31 @@ public class SwerveSubsystem extends SubsystemBase
    * @param tolerance Tolerance in degrees.
    * @return Command to turn the robot to the speaker.
    */
-  public Command aimAtSpeaker(double tolerance)
+  public Command aimAtReef(double tolerance)
   {
     SwerveController controller = swerveDrive.getSwerveController();
     return run(
         () -> {
           ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0,
                                                    controller.headingCalculate(getHeading().getRadians(),
-                                                                               getSpeakerYaw().getRadians()),
+                                                                               getReefYaw().getRadians()),
                                                                        getHeading());
           drive(speeds);
-        }).until(() -> Math.abs(getSpeakerYaw().minus(getHeading()).getDegrees()) < tolerance);
+        }).until(() -> Math.abs(getReefYaw().minus(getHeading()).getDegrees()) < tolerance);
+  }
+
+  public Command aimAtReefContinuous(DoubleSupplier xTranslation, DoubleSupplier yTranslation)
+  {
+    SwerveController controller = swerveDrive.getSwerveController();
+    return run(
+        () -> {
+          
+          ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xTranslation.getAsDouble() * swerveDrive.getMaximumChassisVelocity(), yTranslation.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                                                   controller.headingCalculate(getHeading().getRadians(),
+                                                                               getReefYaw().getRadians()),
+                                                                       getHeading());
+          drive(speeds);
+        });
   }
 
   /**

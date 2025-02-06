@@ -96,7 +96,7 @@ public class RobotContainer
                                                                    () -> -driverXbox.getLeftX())
                                                                .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
                                                                .deadband(OperatorConstants.DEADBAND)
-                                                               .scaleTranslation(0.8)
+                                                               .scaleTranslation(1.0)
                                                                .allianceRelativeControl(true);
 
   SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy().withControllerHeadingAxis(snapAnglesHelper.getXDoubleSupplier(() ->driverXbox.getRightX() * -1,
@@ -128,10 +128,10 @@ public class RobotContainer
   private void configureBindings()
   {
     // (Condition) ? Return-On-True : Return-on-False
-    /*drivebase.setDefaultCommand(!RobotBase.isSimulation() ?
+    drivebase.setDefaultCommand(!RobotBase.isSimulation() ?
                                 driveFieldOrientedDirectAngle :
-                                driveFieldOrientedDirectAngleSim);*/
-    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+                                driveFieldOrientedDirectAngleSim);
+    //drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
 
     if (Robot.isSimulation())
     {
@@ -154,9 +154,9 @@ public class RobotContainer
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.b().whileTrue(
           drivebase.driveToPose(
-              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+              new Pose2d(new Translation2d(6.07, 0.56), Rotation2d.fromDegrees(-90)))
                               );
-      driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
+      driverXbox.y().whileTrue(drivebase.aimAtReefContinuous(() -> driverXbox.getLeftY() * -1,() -> driverXbox.getLeftX() * -1));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());

@@ -20,7 +20,7 @@ public class SnapAnglesHelper {
       mAngles = new ArrayList<>(snapAngles.length);
       for(double angle:snapAngles)
       {
-        mAngles.add(Rotation2d.fromDegrees(angle));
+        mAngles.add(Rotation2d.fromDegrees(angle + 90));
       }
     }
 
