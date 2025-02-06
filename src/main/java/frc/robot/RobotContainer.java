@@ -17,10 +17,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.SnapAnglesHelper.FieldSnapAngles;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import java.io.File;
 import swervelib.SwerveInputStream;
+import java.io.File;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -68,8 +69,10 @@ public class RobotContainer
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
    */
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withSnappedControllerHeadingAxis(SwerveInputStream.FieldSnapAngles.k2025ReefscapeAngles, () -> driverXbox.getRightX() * -1,
-  () -> driverXbox.getRightY() * -1).headingWhile(true);
+  SnapAnglesHelper snapAnglesHelper = new SnapAnglesHelper(FieldSnapAngles.k2025ReefscapeAngles);
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(snapAnglesHelper.getXDoubleSupplier(() ->driverXbox.getRightX() * -1,
+  () -> driverXbox.getRightY() * -1), snapAnglesHelper.getYDoubleSupplier(() ->driverXbox.getRightX() * -1,
+  () -> driverXbox.getRightY() * -1)).headingWhile(true);
 
 
   // Applies deadbands and inverts controls because joysticks
@@ -96,9 +99,9 @@ public class RobotContainer
                                                                .scaleTranslation(0.8)
                                                                .allianceRelativeControl(true);
 
-  SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy().withSnappedControllerHeadingAxis(SwerveInputStream.FieldSnapAngles.k2025ReefscapeAngles, driverXbox::getRightX,
-  driverXbox::getRightY)
-.headingWhile(true);
+  SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy().withControllerHeadingAxis(snapAnglesHelper.getXDoubleSupplier(() ->driverXbox.getRightX() * -1,
+  () -> driverXbox.getRightY() * -1), snapAnglesHelper.getYDoubleSupplier(() ->driverXbox.getRightX() * -1,
+  () -> driverXbox.getRightY() * -1)).headingWhile(true);
 
   Command driveFieldOrientedDirectAngleSim = drivebase.driveFieldOriented(driveDirectAngleSim);
 
