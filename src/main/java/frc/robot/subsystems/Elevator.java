@@ -21,7 +21,7 @@ public class Elevator {
 
     private Elevator()
     {
-        mElevator1= new TalonFX(RobotMap.ELEVATOR_MOTOR_1);
+        mElevator1 = new TalonFX(RobotMap.ELEVATOR_MOTOR_1);
         mElevator2 = new TalonFX(RobotMap.ELEVATOR_MOTOR_2);
 
         mElevator1.setNeutralMode(NeutralModeValue.Brake);
