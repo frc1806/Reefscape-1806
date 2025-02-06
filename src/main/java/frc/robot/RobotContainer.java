@@ -62,15 +62,14 @@ public class RobotContainer
                                                                 () -> driverXbox.getLeftX() * -1)
                                                             .withControllerRotationAxis(driverXbox::getRightX)
                                                             .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(0.8)
+                                                            .scaleTranslation(1.0)
                                                             .allianceRelativeControl(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
    */
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverXbox::getRightX,
-                                                                                             driverXbox::getRightY)
-                                                           .headingWhile(true);
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withSnappedControllerHeadingAxis(SwerveInputStream.FieldSnapAngles.k2025ReefscapeAngles, () -> driverXbox.getRightX() * -1,
+  () -> driverXbox.getRightY() * -1).headingWhile(true);
 
 
   // Applies deadbands and inverts controls because joysticks
@@ -96,16 +95,10 @@ public class RobotContainer
                                                                .deadband(OperatorConstants.DEADBAND)
                                                                .scaleTranslation(0.8)
                                                                .allianceRelativeControl(true);
-  // Derive the heading axis with math!
-  SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy()
-                                                                     .withControllerHeadingAxis(() -> Math.sin(
-                                                                                                    driverXbox.getRawAxis(
-                                                                                                        2) * Math.PI) * (Math.PI * 2),
-                                                                                                () -> Math.cos(
-                                                                                                    driverXbox.getRawAxis(
-                                                                                                        2) * Math.PI) *
-                                                                                                      (Math.PI * 2))
-                                                                     .headingWhile(true);
+
+  SwerveInputStream driveDirectAngleSim     = driveAngularVelocitySim.copy().withSnappedControllerHeadingAxis(SwerveInputStream.FieldSnapAngles.k2025ReefscapeAngles, driverXbox::getRightX,
+  driverXbox::getRightY)
+.headingWhile(true);
 
   Command driveFieldOrientedDirectAngleSim = drivebase.driveFieldOriented(driveDirectAngleSim);
 
@@ -132,9 +125,10 @@ public class RobotContainer
   private void configureBindings()
   {
     // (Condition) ? Return-On-True : Return-on-False
-    drivebase.setDefaultCommand(!RobotBase.isSimulation() ?
+    /*drivebase.setDefaultCommand(!RobotBase.isSimulation() ?
                                 driveFieldOrientedDirectAngle :
-                                driveFieldOrientedDirectAngleSim);
+                                driveFieldOrientedDirectAngleSim);*/
+    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
 
     if (Robot.isSimulation())
     {
