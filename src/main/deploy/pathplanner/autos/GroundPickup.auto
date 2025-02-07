@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GroundPickupStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GroundPickupTo2ndCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GroundPickupTo3rdCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GroundPickupTo4thCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GroundPickupBonusTail"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

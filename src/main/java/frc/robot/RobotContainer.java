@@ -172,8 +172,9 @@ public class RobotContainer
    */
   public Command getAutonomousCommand()
   {
+    //TODO setup path planner autos
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return drivebase.getAutonomousCommand("GroundPickup");
   }
 
   public void setDriveMode()

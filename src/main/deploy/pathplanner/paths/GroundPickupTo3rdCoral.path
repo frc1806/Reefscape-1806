@@ -1,0 +1,102 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.1909090909090905,
+        "y": 4.150129941976988
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.0541477272727273,
+        "y": 4.578423295454545
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.1909090909090905,
+        "y": 3.8341272169693483
+      },
+      "prevControl": {
+        "x": 3.4376945394644807,
+        "y": 3.7941654554802193
+      },
+      "nextControl": {
+        "x": 1.7350568181818182,
+        "y": 4.069872159090909
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.3062784090909094,
+        "y": 4.464339173588204
+      },
+      "prevControl": {
+        "x": 1.4219583616767475,
+        "y": 4.797271720054762
+      },
+      "nextControl": {
+        "x": 0.8974431818181817,
+        "y": 3.2876914463154776
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.2535795454545453,
+        "y": 4.150129941976988
+      },
+      "prevControl": {
+        "x": 1.6170018507109363,
+        "y": 3.9352456340479645
+      },
+      "nextControl": {
+        "x": 3.0287475995121054,
+        "y": 4.411797060068417
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.1909090909090905,
+        "y": 4.464339173588204
+      },
+      "prevControl": {
+        "x": 3.2354001243292583,
+        "y": 4.710348417205605
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.1,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 1.041626676010001
+  },
+  "reversed": false,
+  "folder": "GroundPickupAuto",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
