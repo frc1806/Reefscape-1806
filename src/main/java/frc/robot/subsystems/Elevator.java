@@ -1,17 +1,23 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.RobotMap;
+import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator {
     private TalonFX mElevator1, mElevator2;
+    private double mWantedHeight;
 
     private static final Elevator INSTANCE = new Elevator();
 
@@ -21,6 +27,7 @@ public class Elevator {
 
     private Elevator()
     {
+        mWantedHeight = 0;
         mElevator1 = new TalonFX(RobotMap.ELEVATOR_MOTOR_1);
         mElevator2 = new TalonFX(RobotMap.ELEVATOR_MOTOR_2);
 
@@ -45,8 +52,19 @@ public class Elevator {
         Slot0Configs.kV = 0;
         Slot0Configs.kA = 0;
 
+        var motionMagicConfigs = new MotionMagicConfigs();
+        motionMagicConfigs.MotionMagicAcceleration = 0;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 0;
+
+
 
         motor1Configurator.apply(Slot0Configs);
+        motor1Configurator.apply(motionMagicConfigs);
+
+        var feedbackConfigs = new FeedbackConfigs();
+        feedbackConfigs.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor);
+        feedbackConfigs.withSensorToMechanismRatio(ElevatorConstants.ELEVATOR_CONVERSION_FACTOR);
+        motor1Configurator.apply(feedbackConfigs);
 
         final DutyCycleOut stopRequest = new DutyCycleOut(0);
 
@@ -65,16 +83,17 @@ public class Elevator {
      * @param inches distance of the carriage, in inches from the bottom of the elevator.
      */
     public void GoToPosition(double inches) {
-        //TODO: implement
+        mWantedHeight = inches;
+        mElevator1.setControl(new MotionMagicVoltage(inches));
     }
 
     
     /** 
+     * return the carrage height in inches
      * @return double
      */
     public double GetPosition() {
-        //TODO: implement
-        return 0.0;
+        return mElevator1.getPosition().getValueAsDouble();
     }
 
     
@@ -82,8 +101,7 @@ public class Elevator {
      * @return boolean
      */
     public boolean isAtPosition(){
-        //TODO: implement
-        return false;
+        return Math.abs(mWantedHeight - GetPosition()) < ElevatorConstants.ELEVATOR_HEIGHT_TOLERANCE && Math.abs(getVelocity()) < ElevatorConstants.ELEVATOR_SPEED_TOLERANCE;
     }
 
     /** 
@@ -91,6 +109,7 @@ public class Elevator {
      */
     public void stopElevator(){
         //TODO: implement
+        mElevator1.stopMotor();
 }
 
     
@@ -98,12 +117,12 @@ public class Elevator {
      * @return double
      */
     public double getVelocity(){
-        //TODO: implement
-        return 0.0;
+        
+        return mElevator1.getVelocity().getValueAsDouble();
     }
     
     public boolean isAboveHeight(double height){
         //TODO: implement
-        return false;
+        return GetPosition() > height;
     }
 }
