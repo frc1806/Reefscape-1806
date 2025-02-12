@@ -34,6 +34,8 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         kHoldingIn,
         kMovingToIntake,
         kHoldIntakeOut,
+        kGoingToArbitraryPosition,
+        kAtArbitraryPosition,
         kDisabled
     }
 
@@ -44,6 +46,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
 
     private SparkMaxConfig mIntakeConfig;
     private TalonFXConfiguration mIntakeRollerConfig;
+    private double mDesiredArbitraryPosition;
 
     public MotorizedArmIntake()
     {
@@ -51,6 +54,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         mArmState = isIntakeEnabled()? MotorizedIntakeArmState.kHoldingIn:MotorizedIntakeArmState.kDisabled;
 
         mSpitOut = false;
+        mDesiredArbitraryPosition = getIntakeArmAngleAtRest(); //Set arb position to safe default.
         
         //Setup intake arm motor, use abstract function calls to get information specific to the intake type
         mIntakeArmMotor = new SparkMax(getIntakeArmMotorId(), MotorType.kBrushless);
@@ -324,6 +328,26 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
     }
 
     /**
+     * Move the intake to an arbitrary angle, does not spin rollers.
+     * @param angle desired angle.
+     */
+    public void goToArbitraryPosition(double angle)
+    {
+        mDesiredArbitraryPosition = angle;
+        mArmState = MotorizedIntakeArmState.kGoingToArbitraryPosition;
+    }
+
+    /**
+     * See if we are within the acceptable range of the arbitrary angle given.
+     * @param angle desired angle
+     * @return true if we are within the holding out angle deviation of the given angle. false otherwise.
+     */
+    public boolean isAtArbitraryPosition(double angle)
+    {
+        return Math.abs(mIntakeArmMotor.getAbsoluteEncoder().getPosition() - angle) < getAcceptableHoldingOutAngleDeviation();
+    }
+
+    /**
      * FUNCTION CALLS TO CHECK IF A THING IS DONE
      */
 
@@ -349,11 +373,9 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
      * Has this thing been disabled?
      * @return
      */
-    private boolean isDisabled(){
+    public boolean isDisabled(){
         return mArmState == MotorizedIntakeArmState.kDisabled;
     }
-
-
 
     @Override
     public void periodic()
@@ -409,6 +431,22 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
                 mIntakeRollerMotor.stopMotor();
                 mIntakeArmMotor.stopMotor();
             break;
+            case kAtArbitraryPosition:
+                mIntakeRollerMotor.stopMotor();
+                mIntakeArmMotor.getClosedLoopController().setReference(mDesiredArbitraryPosition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1);
+                if(Math.abs(armPosition - mDesiredArbitraryPosition) > getAcceptableHoldingOutAngleDeviation()){
+                    mArmState = MotorizedIntakeArmState.kGoingToArbitraryPosition;
+                }
+                break;
+            case kGoingToArbitraryPosition:
+                mIntakeRollerMotor.stopMotor();
+                mIntakeArmMotor.getClosedLoopController().setReference(mDesiredArbitraryPosition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
+                if(Math.abs(armPosition - mDesiredArbitraryPosition) < getMaximumAllowedClosedLoopError()){
+                    mArmState = MotorizedIntakeArmState.kAtArbitraryPosition;
+                }
+                break;
+            default:
+                break;
         }
 
         //Update smart dashbaord
