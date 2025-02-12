@@ -73,6 +73,33 @@ public final class Constants
     public static final boolean IS_INTAKE_ROLLER_INVERTED = false;
     public static final int CLAW_ROTATION_CURRENT_LIMIT = 20;
     public static final boolean CLAW_INTAKE_ARM_INVERTED = false;
+    public static final double ARM_GEAR_RATIO = 75.00; // 75:1
+    public static final double ARM_CENTER_OF_MASS_DISTANCE = Units.inchesToMeters(Math.hypot(7.218, 3.194));
+    public static final double ARM_MASS = Units.lbsToKilograms(3.832);
 
-}
+  }
+
+  public static class CoralClawConstants
+  {
+    public static class ClawRotationConstants
+    {
+      public static final double MAXIMUM_ALLOWED_CLOSED_LOOP_ERROR = 0.0;
+      public static final double MAX_MOTION_MAX_ACCELERATION = 0.0;
+      public static final double MAX_MOTION_MAX_VELOCITY = 0.0;
+      public static final double MOVING_P_GAIN = 0.0;
+      public static final double MOVING_I_GAIN = 0.0;
+      public static final double MOVING_D_GAIN = 0.0;
+    }
+
+    public static class ClawOpenCloseConstants
+    {
+      public static final double MAXIMUM_ALLOWED_CLOSED_LOOP_ERROR = 0.0;
+      public static final double MAX_MOTION_MAX_ACCELERATION = 0.0;
+      public static final double MAX_MOTION_MAX_VELOCITY = 0.0;
+      public static final double MOVING_P_GAIN = 0.0;
+      public static final double MOVING_I_GAIN = 0.0;
+      public static final double MOVING_D_GAIN = 0.0;
+    }
+    public static final double ARM_GEAR_RATIO = 75.00; // 75:1
+  }
 }

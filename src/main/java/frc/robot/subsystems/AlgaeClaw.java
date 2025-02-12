@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.servohub.ServoHub.ResetMode;
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -21,13 +22,20 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeClawConstants;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 public class AlgaeClaw extends SubsystemBase{
     private TalonFX mClawRollerMotor;
     private SparkFlex mClawAngleMotor;
+    private SingleJointedArmSim mArmSim;
+    private SparkAbsoluteEncoderSim mEncoderSim;
 
     public AlgaeClaw() {
         mClawAngleMotor = new SparkFlex(RobotMap.ALGAE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
@@ -69,5 +77,23 @@ public class AlgaeClaw extends SubsystemBase{
         rollerOutputConfig.withNeutralMode(NeutralModeValue.Coast);
         mIntakeRollerConfig.withMotorOutput(rollerOutputConfig);
         intakeRollerConfigurator.apply(mIntakeRollerConfig);
+
+        mEncoderSim = new SparkAbsoluteEncoderSim(mClawAngleMotor);
+
+        mArmSim = 
+        new SingleJointedArmSim(DCMotor.getNeoVortex(1), AlgaeClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, AlgaeClawConstants.ARM_MASS), AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(360), true, 0.0, 0.0);
+    }
+
+    @Override
+    public void simulationPeriodic(){
+        mArmSim.setInput(mClawAngleMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+        mArmSim.update(Robot.kDefaultPeriod);
+        mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
+        mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+    }
+
+    @Override
+    public void periodic(){
+
     }
 }
