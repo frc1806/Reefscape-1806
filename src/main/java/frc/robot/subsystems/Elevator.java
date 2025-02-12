@@ -25,7 +25,6 @@ public class Elevator extends SubsystemBase{
     private double mWantedHeight;
     private ElevatorSim mElevatorSim;
 
-    private double mDesiredPosition;
 
     private static final Elevator INSTANCE = new Elevator();
 
@@ -35,8 +34,7 @@ public class Elevator extends SubsystemBase{
 
     private Elevator()
     {
-        mWantedHeight = 0;
-        mDesiredPosition = 6.75;
+        mWantedHeight = 6.75
         mElevator1 = new TalonFX(RobotMap.ELEVATOR_MOTOR_1);
         mElevator2 = new TalonFX(RobotMap.ELEVATOR_MOTOR_2);
 
@@ -117,15 +115,12 @@ public class Elevator extends SubsystemBase{
      */
     public boolean isAtPosition(){
         return Math.abs(mWantedHeight - GetPosition()) < ElevatorConstants.ELEVATOR_HEIGHT_TOLERANCE && Math.abs(getVelocity()) < ElevatorConstants.ELEVATOR_SPEED_TOLERANCE;
-        return Math.abs(GetPosition() - mDesiredPosition) < 1.0;
     }
 
     /** 
      * Stops the elevator
      */
     public void stopElevator(){
-        mElevator1.stopMotor();
-        //TODO: implement
         mElevator1.stopMotor();
 }
 
