@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig;
@@ -23,9 +24,10 @@ import frc.robot.RobotMap;
 public class AlgaeClaw {
     private TalonFX mClawRollerMotor;
     private SparkFlex mClawAngleMotor;
+    }
 
     public AlgaeClaw() {
-        mClawAngleMotor = new SparkFlex(0, null)
+        mClawAngleMotor = new SparkFlex(0, MotorType.kBrushless);
         AbsoluteEncoderConfig clawEncoderConfig = new AbsoluteEncoderConfig();
         //configure through bore encoder. We will Zero them in rev's hardware client.
         clawEncoderConfig.positionConversionFactor(360);
@@ -46,12 +48,10 @@ public class AlgaeClaw {
 
         clawCon.apply(armEncoderConfig);
         mIntakeConfig.apply(armClosedLoopConfig);
-        mIntakeConfig.smartCurrentLimit(getIntakeArmCurrentLimit());
-        mIntakeConfig.inverted(isIntakeArmMotorInverted());
-        mIntakeConfig.idleMode(IdleMode.kCoast);
-        mIntakeArmMotor.configure(mIntakeConfig, SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        //configure intake roller motor
+        mIntakeConfig.smartCurrentLimit();
+        mIntakeConfig.inverted(IntakeArmMotorInverted);
+        mIntakeConfig.idleMode(IdleMode.kBrake);
+        mIntakeArmMotor.configure(mIntakeConfig);
         mClawRollerMotor = new TalonFX(RobotMap.INTAKE_ROLLER_MOTOR_ID);
         TalonFXConfigurator intakeRollerConfigurator = mClawRollerMotor.getConfigurator();
         CurrentLimitsConfigs intakeRollerCurrentConfigs = new CurrentLimitsConfigs();
