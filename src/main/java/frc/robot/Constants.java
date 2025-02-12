@@ -51,7 +51,9 @@ public final class Constants
 
   public static class ElevatorConstants
   {
-    public static final double ELEVATOR_CONVERSION_FACTOR = 1.86156818017715;
+    public static final double ELEVATOR_CASCADE_STAGES = 3.0;
+    public static final double ELEVATOR_DRUM_DIAMETER = 1.0;
+    public static final double ELEVATOR_GEAR_RATIO = 64.0/12.0;
     public static final double ELEVATOR_HEIGHT_TOLERANCE = 1.5; //inches
     public static final double ELEVATOR_SPEED_TOLERANCE = 10.0; //inches per second
     public static final double ELEVATOR_MIN_HEIGHT = 6.75; //TODO: SET

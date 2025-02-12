@@ -7,7 +7,9 @@ import org.dyn4j.geometry.Matrix22;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -15,11 +17,12 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -52,23 +55,23 @@ public class Elevator extends SubsystemBase{
         TalonFXConfigurator motor2Configurator = mElevator2.getConfigurator();
 
         var motorCurrent = new CurrentLimitsConfigs();
-        motorCurrent.StatorCurrentLimit = 120;
-        motorCurrent.SupplyCurrentLimit = 50;
+        motorCurrent.StatorCurrentLimit = 160;
+        motorCurrent.SupplyCurrentLimit = 70;
         motor1Configurator.apply(motorCurrent);
         motor2Configurator.apply(motorCurrent);
 
         var Slot0Configs = new Slot0Configs();
-        Slot0Configs.kP = 1.0 / 20.0;
+        Slot0Configs.kP = 1.5;
         Slot0Configs.kI = 0;
         Slot0Configs.kD = 0;
-        Slot0Configs.kG = .57;
-        Slot0Configs.kS = 0;
-        Slot0Configs.kV = 8.02;
-        Slot0Configs.kA = 0.09;
+        //Slot0Configs.kG = .057;
+        //Slot0Configs.kS = 0;
+        //Slot0Configs.kV = .802;
+        //Slot0Configs.kA = 0.009;
 
         var motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicAcceleration = 60.0;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 50.0;
+        motionMagicConfigs.MotionMagicAcceleration = 600.0;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 200.0;
 
 
 
@@ -77,8 +80,22 @@ public class Elevator extends SubsystemBase{
 
         var feedbackConfigs = new FeedbackConfigs();
         feedbackConfigs.withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor);
-        feedbackConfigs.withSensorToMechanismRatio(ElevatorConstants.ELEVATOR_CONVERSION_FACTOR);
+        feedbackConfigs.withSensorToMechanismRatio(ElevatorConstants.ELEVATOR_GEAR_RATIO / (ElevatorConstants.ELEVATOR_CASCADE_STAGES * ElevatorConstants.ELEVATOR_DRUM_DIAMETER * Math.PI));
+        
         motor1Configurator.apply(feedbackConfigs);
+        MotorOutputConfigs outputConfigs = new MotorOutputConfigs();
+        outputConfigs.withPeakForwardDutyCycle(1.0);
+        outputConfigs.withPeakReverseDutyCycle(-1.0);
+        outputConfigs.withInverted(InvertedValue.Clockwise_Positive);
+        motor1Configurator.apply(outputConfigs);
+        
+        SoftwareLimitSwitchConfigs softLimitConfigs  = new SoftwareLimitSwitchConfigs();
+        softLimitConfigs.ForwardSoftLimitEnable = true;
+        softLimitConfigs.ForwardSoftLimitThreshold = ElevatorConstants.ELEVATOR_MAX_HEIGHT;
+        softLimitConfigs.ReverseSoftLimitEnable = true;
+        softLimitConfigs.ReverseSoftLimitThreshold = ElevatorConstants.ELEVATOR_MIN_HEIGHT;
+
+        motor1Configurator.apply(softLimitConfigs);
 
         final DutyCycleOut stopRequest = new DutyCycleOut(0);
 
@@ -87,9 +104,8 @@ public class Elevator extends SubsystemBase{
 
 
         mElevator1.setControl(stopRequest);
-
         //Values here are weird because we're simulating a cascade as just a really heavy 1 stage
-        mElevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2), 5.333, Units.lbsToKilograms(85), Units.inchesToMeters(0.5), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MAX_HEIGHT/3.0), true, Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0));
+        mElevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2), ElevatorConstants.ELEVATOR_GEAR_RATIO, Units.lbsToKilograms(85), Units.inchesToMeters(ElevatorConstants.ELEVATOR_DRUM_DIAMETER/2.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MAX_HEIGHT/3.0), true, Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0));
         mElevator1.setPosition(ElevatorConstants.ELEVATOR_MIN_HEIGHT);
      }
 
@@ -138,16 +154,21 @@ public class Elevator extends SubsystemBase{
     }
     
     public boolean isAboveHeight(double height){
-        //TODO: implement
         return GetPosition() > height;
     }
 
     @Override
     public void simulationPeriodic()
     {
-        mElevatorSim.setInputVoltage(mElevator1.getMotorVoltage().getValueAsDouble());
+        mElevator1.getSimState().setSupplyVoltage(RobotController.getBatteryVoltage());
+        mElevatorSim.setInputVoltage(-mElevator1.getSimState().getMotorVoltage());
         mElevatorSim.update(Robot.kDefaultPeriod);
-        mElevator1.setPosition(Units.metersToInches(mElevatorSim.getPositionMeters() * 3.0)); //Convert to cascade by multiplying by 3
+        mElevator1.getSimState().setRotorVelocity(-Units.metersToInches(mElevatorSim.getVelocityMetersPerSecond()) * (ElevatorConstants.ELEVATOR_GEAR_RATIO / (ElevatorConstants.ELEVATOR_DRUM_DIAMETER * Math.PI)));
+        mElevator1.getSimState().setRawRotorPosition(-(Units.metersToInches(mElevatorSim.getPositionMeters()) -(ElevatorConstants.ELEVATOR_MIN_HEIGHT / ElevatorConstants.ELEVATOR_CASCADE_STAGES))* (ElevatorConstants.ELEVATOR_GEAR_RATIO / (ElevatorConstants.ELEVATOR_DRUM_DIAMETER * Math.PI)));
+        //mElevator1.setPosition(Units.metersToInches(mElevatorSim.getPositionMeters() * 3.0)); //Convert to cascade by multiplying by 3
+        SmartDashboard.putNumber("Elevator/Simulation/SimElevatorHeight", Units.metersToInches(3.0 * mElevatorSim.getPositionMeters()));
+        SmartDashboard.putNumber("Elevator/Simulation/CurrentDraw", mElevatorSim.getCurrentDrawAmps());
+        SmartDashboard.putNumber("Elevator/Simulation/ElevatorVelocity", Units.metersToInches(3.0 * mElevatorSim.getVelocityMetersPerSecond()));
 
     }
 
@@ -155,8 +176,11 @@ public class Elevator extends SubsystemBase{
     public void periodic()
     {
         SmartDashboard.putNumber("Elevator/CurrentHeight", GetPosition());
+        SmartDashboard.putNumber("Elevator/Velocity", getVelocity());
         SmartDashboard.putNumber("Elevator/DesiredHeight", mWantedHeight);
-        SmartDashboard.putNumber("Elevator/MotorOut", mElevator1.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("Elevator/MotorOutVolts", mElevator1.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("Elevator/MotorOutDutyCycle", mElevator1.getDutyCycle().getValueAsDouble());
+        SmartDashboard.putBoolean("Elevator/isAtPosition", isAtPosition());
     }
 
 }
