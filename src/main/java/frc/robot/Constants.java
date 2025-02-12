@@ -67,5 +67,8 @@ public final class Constants
     public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT = 0.0;
     public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT = 0.0;
     public static final boolean IS_INTAKE_ROLLER_INVERTED = false;
-  }
+    public static final int CLAW_ROTATION_CURRENT_LIMIT = 20;
+    public static final boolean CLAW_INTAKE_ARM_INVERTED = false;
+
+}
 }
