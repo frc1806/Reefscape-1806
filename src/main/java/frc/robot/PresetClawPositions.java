@@ -24,8 +24,8 @@ public enum PresetClawPositions {
     /**
      * Make a preset combination of elevator height, coral claw angle, and algae claw angle.
      * @param elevatorHeight elevator height to the bottom of the carriage in inches
-     * @param coralClawAngle coral claw angle in degrees
-     * @param algaeClawAngle algae claw angle in degrees
+     * @param coralClawAngle coral claw angle in degrees. If you are staring at the claw's axle, its home position (0 degrees) is it pointing straight left, and counterclockwise is positive.
+     * @param algaeClawAngle algae claw angle in degrees. If you ar estaring at the claw's axle, its home position (0 degrees) is it pointing straight right, and counterclockwise is positive.
      */
     private PresetClawPositions(double elevatorHeight, double coralClawAngle, double algaeClawAngle){
         mElevatorHeight = elevatorHeight;
