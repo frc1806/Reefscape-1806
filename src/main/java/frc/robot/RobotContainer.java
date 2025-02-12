@@ -16,9 +16,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.SnapAnglesHelper.FieldSnapAngles;
+import frc.robot.commands.elevator.ElevatorToHeight;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import java.io.File;
@@ -157,10 +160,11 @@ public class RobotContainer
               new Pose2d(new Translation2d(6.07, 0.56), Rotation2d.fromDegrees(-90)))
                               );
       driverXbox.y().whileTrue(drivebase.aimAtReefContinuous(() -> driverXbox.getLeftY() * -1,() -> driverXbox.getLeftX() * -1));
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
+      driverXbox.start().whileTrue(new ElevatorToHeight(ElevatorConstants.ELEVATOR_MIN_HEIGHT));
+      driverXbox.back().whileTrue(new ElevatorToHeight(32.0));//TODO: Replace with an actual height or command we care about.
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
+      driverXbox.rightBumper().onTrue(new ElevatorToHeight(75.0)); //TODO: Replace with an actual height we care about.
+
     }
 
   }

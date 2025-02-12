@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import java.util.Arrays;
+
+import org.dyn4j.geometry.Matrix22;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -13,10 +17,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -34,7 +41,7 @@ public class Elevator extends SubsystemBase{
 
     private Elevator()
     {
-        mWantedHeight = 6.75
+        mWantedHeight = ElevatorConstants.ELEVATOR_MIN_HEIGHT;
         mElevator1 = new TalonFX(RobotMap.ELEVATOR_MOTOR_1);
         mElevator2 = new TalonFX(RobotMap.ELEVATOR_MOTOR_2);
 
@@ -60,8 +67,8 @@ public class Elevator extends SubsystemBase{
         Slot0Configs.kA = 0.09;
 
         var motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicAcceleration = 0;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 0;
+        motionMagicConfigs.MotionMagicAcceleration = 60.0;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 50.0;
 
 
 
@@ -82,8 +89,8 @@ public class Elevator extends SubsystemBase{
         mElevator1.setControl(stopRequest);
 
         //Values here are weird because we're simulating a cascade as just a really heavy 1 stage
-        mElevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2), 5.333, Units.lbsToKilograms(85), Units.inchesToMeters(0.5), Units.inchesToMeters(28), Units.inchesToMeters(28.0), true, Units.inchesToMeters(6.75), null);
-
+        mElevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2), 5.333, Units.lbsToKilograms(85), Units.inchesToMeters(0.5), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MAX_HEIGHT/3.0), true, Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0));
+        mElevator1.setPosition(ElevatorConstants.ELEVATOR_MIN_HEIGHT);
      }
 
     
@@ -95,8 +102,6 @@ public class Elevator extends SubsystemBase{
     public void GoToPosition(double inches) {
         mWantedHeight = inches;
         mElevator1.setControl(new MotionMagicVoltage(inches));
-        mDesiredPosition = inches;
-        mElevator1.setControl(new MotionMagicVoltage(inches));
     }
 
     
@@ -105,7 +110,6 @@ public class Elevator extends SubsystemBase{
      * @return double
      */
     public double GetPosition() {
-        return mElevator1.getPosition().getValueAsDouble();
         return mElevator1.getPosition().getValueAsDouble();
     }
 
@@ -142,14 +146,17 @@ public class Elevator extends SubsystemBase{
     public void simulationPeriodic()
     {
         mElevatorSim.setInputVoltage(mElevator1.getMotorVoltage().getValueAsDouble());
-        mElevator1.setPosition(Units.metersToInches(mElevatorSim.getPositionMeters() * 3.0)); //Convert to cascade
+        mElevatorSim.update(Robot.kDefaultPeriod);
+        mElevator1.setPosition(Units.metersToInches(mElevatorSim.getPositionMeters() * 3.0)); //Convert to cascade by multiplying by 3
 
     }
 
     @Override
     public void periodic()
     {
-
+        SmartDashboard.putNumber("Elevator/CurrentHeight", GetPosition());
+        SmartDashboard.putNumber("Elevator/DesiredHeight", mWantedHeight);
+        SmartDashboard.putNumber("Elevator/MotorOut", mElevator1.getMotorVoltage().getValueAsDouble());
     }
 
 }

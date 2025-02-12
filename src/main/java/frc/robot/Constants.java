@@ -54,6 +54,8 @@ public final class Constants
     public static final double ELEVATOR_CONVERSION_FACTOR = 1.86156818017715;
     public static final double ELEVATOR_HEIGHT_TOLERANCE = 1.5; //inches
     public static final double ELEVATOR_SPEED_TOLERANCE = 10.0; //inches per second
+    public static final double ELEVATOR_MIN_HEIGHT = 6.75; //TODO: SET
+    public static final double ELEVATOR_MAX_HEIGHT = 80.0; //TODO: SET
   }
 
   public static class AlgaeClawConstants

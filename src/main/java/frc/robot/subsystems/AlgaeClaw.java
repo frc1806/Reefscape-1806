@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -15,19 +16,22 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.MAXMotionConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeClawConstants;
 import frc.robot.RobotMap;
 
-public class AlgaeClaw {
+public class AlgaeClaw extends SubsystemBase{
     private TalonFX mClawRollerMotor;
     private SparkFlex mClawAngleMotor;
-    }
 
     public AlgaeClaw() {
-        mClawAngleMotor = new SparkFlex(0, MotorType.kBrushless);
+        mClawAngleMotor = new SparkFlex(RobotMap.ALGAE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
+        SparkBaseConfig clawAngleConfig = new SparkFlexConfig();
         AbsoluteEncoderConfig clawEncoderConfig = new AbsoluteEncoderConfig();
         //configure through bore encoder. We will Zero them in rev's hardware client.
         clawEncoderConfig.positionConversionFactor(360);
@@ -46,13 +50,13 @@ public class AlgaeClaw {
         armClosedLoopConfig.pid(AlgaeClawConstants.MOVING_P_GAIN, AlgaeClawConstants.MOVING_I_GAIN, AlgaeClawConstants.MOVING_D_GAIN, ClosedLoopSlot.kSlot0);
         armClosedLoopConfig.apply(clawMoveConfig);
 
-        clawCon.apply(armEncoderConfig);
-        mIntakeConfig.apply(armClosedLoopConfig);
-        mIntakeConfig.smartCurrentLimit();
-        mIntakeConfig.inverted(IntakeArmMotorInverted);
-        mIntakeConfig.idleMode(IdleMode.kBrake);
-        mIntakeArmMotor.configure(mIntakeConfig);
-        mClawRollerMotor = new TalonFX(RobotMap.INTAKE_ROLLER_MOTOR_ID);
+        clawAngleConfig.apply(clawEncoderConfig);
+        clawAngleConfig.apply(armClosedLoopConfig);
+        clawAngleConfig.smartCurrentLimit(AlgaeClawConstants.CLAW_ROTATION_CURRENT_LIMIT);
+        clawAngleConfig.inverted(AlgaeClawConstants.CLAW_INTAKE_ARM_INVERTED);
+        clawAngleConfig.idleMode(IdleMode.kBrake);
+        mClawAngleMotor.configure(clawAngleConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        mClawRollerMotor = new TalonFX(RobotMap.ALGAE_CLAW_ROLLER_MOTOR_ID);
         TalonFXConfigurator intakeRollerConfigurator = mClawRollerMotor.getConfigurator();
         CurrentLimitsConfigs intakeRollerCurrentConfigs = new CurrentLimitsConfigs();
         intakeRollerCurrentConfigs.withSupplyCurrentLimit(AlgaeClawConstants.INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT);
