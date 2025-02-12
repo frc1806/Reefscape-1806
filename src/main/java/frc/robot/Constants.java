@@ -48,4 +48,24 @@ public final class Constants
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
   }
+
+  public static class ElevatorConstants
+  {
+    public static final double ELEVATOR_CONVERSION_FACTOR = 1.86156818017715;
+    public static final double ELEVATOR_HEIGHT_TOLERANCE = 1.5; //inches
+    public static final double ELEVATOR_SPEED_TOLERANCE = 10.0; //inches per second
+  }
+
+  public static class AlgaeClawConstants
+  {
+    public static final double MAXIMUM_ALLOWED_CLOSED_LOOP_ERROR = 0.0;
+    public static final double MAX_MOTION_MAX_ACCELERATION = 0.0;
+    public static final double MAX_MOTION_MAX_VELOCITY = 0.0;
+    public static final double MOVING_P_GAIN = 0.0;
+    public static final double MOVING_I_GAIN = 0.0;
+    public static final double MOVING_D_GAIN = 0.0;
+    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT = 0.0;
+    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT = 0.0;
+    public static final boolean IS_INTAKE_ROLLER_INVERTED = false;
+  }
 }
