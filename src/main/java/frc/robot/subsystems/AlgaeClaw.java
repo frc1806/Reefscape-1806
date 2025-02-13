@@ -32,12 +32,20 @@ import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 public class AlgaeClaw extends SubsystemBase{
+
+    private static final AlgaeClaw S_INSTANCE = new AlgaeClaw();
+
+    public static AlgaeClaw GetInstance(){
+        return S_INSTANCE;
+    }
+
+
     private TalonFX mClawRollerMotor;
     private SparkFlex mClawAngleMotor;
     private SingleJointedArmSim mArmSim;
     private SparkAbsoluteEncoderSim mEncoderSim;
 
-    public AlgaeClaw() {
+    private AlgaeClaw() {
         mClawAngleMotor = new SparkFlex(RobotMap.ALGAE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
         SparkBaseConfig clawAngleConfig = new SparkFlexConfig();
         AbsoluteEncoderConfig clawEncoderConfig = new AbsoluteEncoderConfig();

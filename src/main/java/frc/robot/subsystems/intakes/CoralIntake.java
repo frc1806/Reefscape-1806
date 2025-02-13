@@ -1,167 +1,168 @@
 package frc.robot.subsystems.intakes;
 
+import edu.wpi.first.math.util.Units;
+import frc.robot.RobotMap;
+
 public class CoralIntake extends MotorizedArmIntake{
+
+    private static final CoralIntake S_INSTANCE = new CoralIntake();
+
+    public static CoralIntake GetInstance(){
+        return S_INSTANCE;
+    }
+
+    private CoralIntake(){
+        super();
+    }
 
     @Override
     protected boolean isIntakeEnabled() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isIntakeEnabled'");
+        return true;
     }
 
     @Override
     protected String getIntakeName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeName'");
+        return "CoralIntake";
     }
 
     @Override
     protected int getIntakeRollerMotorId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeRollerMotorId'");
+        return RobotMap.CORAL_INTAKE_ROLLER_ID;
     }
 
     @Override
     protected boolean isIntakeRollerInverted() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isIntakeRollerInverted'");
+        return false;
     }
 
     @Override
     protected double getIntakeRollerStatorCurrentLimit() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeRollerStatorCurrentLimit'");
+        return 120.0;
     }
 
     @Override
     protected double getIntakeRollerSupplyCurrentLimit() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeRollerSupplyCurrentLimit'");
+        return 50.0;
     }
 
     @Override
     protected int getIntakeArmMotorId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeArmMotorId'");
+        return RobotMap.CORAL_INTAKE_ARM_ID;
     }
 
     @Override
     protected boolean isIntakeArmMotorInverted() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isIntakeArmMotorInverted'");
+        return false;
     }
 
     @Override
     protected boolean isIntakeArmEncoderInverted() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isIntakeArmEncoderInverted'");
+        return false;
     }
 
     @Override
     protected int getIntakeArmCurrentLimit() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeArmCurrentLimit'");
+        return 20;
     }
 
     @Override
     protected double getMovingPGain() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMovingPGain'");
+        return 1.0/30.0;
     }
 
     @Override
     protected double getMovingIGain() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMovingIGain'");
+        return 0.0;
     }
 
     @Override
     protected double getMovingDGain() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMovingDGain'");
+        return 0.0;
     }
 
     @Override
     protected double getMaxMotionMaxVelocity() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMaxMotionMaxVelocity'");
+        return 180.0;
     }
 
     @Override
     protected double getMaxMotionMaxAcceleration() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMaxMotionMaxAcceleration'");
+        return 360.0;
     }
 
     @Override
     protected double getMaximumAllowedClosedLoopError() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMaximumAllowedClosedLoopError'");
+        return 1.0;
     }
 
     @Override
     protected double getHoldingPGain() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getHoldingPGain'");
+        return 1.0/90.0;
     }
 
     @Override
     protected double getHoldingIGain() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getHoldingIGain'");
+        return 0.0;
     }
 
     @Override
     protected double getHoldingDGain() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getHoldingDGain'");
+        return 0.0;
     }
 
     @Override
     protected double getIntakeArmAngleAtRest() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeArmAngleAtRest'");
+        return -2.0;
     }
 
     @Override
     protected double getIntakeArmAngleAtExtension() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeArmAngleAtExtension'");
+        return 90.0;
     }
 
     @Override
     protected double getIntakeRollerSpeedIntaking() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeRollerSpeedIntaking'");
+        return 12.0;
     }
 
     @Override
     protected double getIntakeRollerSpeedSpitOut() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIntakeRollerSpeedSpitOut'");
+        return -12.0;
     }
 
     @Override
     protected double getAcceptableHoldInAngleDeviation() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAcceptableHoldInAngleDeviation'");
+        return 5.0;
     }
 
     @Override
     protected double getAcceptableHoldingOutAngleDeviation() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAcceptableHoldingOutAngleDeviation'");
+        return 15.0;
     }
 
     @Override
     protected double getMinimumEverReasonableAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMinimumEverReasonableAngle'");
+        return -5.0;
     }
 
     @Override
     protected double getMaximumEverReasonableAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMaximumEverReasonableAngle'");
+        return 110.0;
+    }
+
+    @Override
+    protected double getArmGearRatio() {
+        return 5 * 5 * (30.0/18.0);
+    }
+
+    @Override
+    protected double getArmCenterOfGravityDistance() {
+        return Units.inchesToMeters(Math.hypot(6.021, 2.536));
+    }
+
+    @Override
+    protected double getArmMass() {
+        return Units.lbsToKilograms(4.544);
     }
 
 }

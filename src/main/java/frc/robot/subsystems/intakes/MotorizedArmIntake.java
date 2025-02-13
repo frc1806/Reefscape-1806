@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
@@ -18,11 +19,15 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.MAXMotionConfig;
+import com.revrobotics.spark.config.SmartMotionConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -47,8 +52,10 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
     private SparkMaxConfig mIntakeConfig;
     private TalonFXConfiguration mIntakeRollerConfig;
     private double mDesiredArbitraryPosition;
+    private SingleJointedArmSim mArmSim;
+    private SparkAbsoluteEncoderSim mEncoderSim;
 
-    public MotorizedArmIntake()
+    protected MotorizedArmIntake()
     {
         //Idle arm
         mArmState = isIntakeEnabled()? MotorizedIntakeArmState.kHoldingIn:MotorizedIntakeArmState.kDisabled;
@@ -100,6 +107,9 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         rollerOutputConfig.withNeutralMode(NeutralModeValue.Coast);
         mIntakeRollerConfig.withMotorOutput(rollerOutputConfig);
         intakeRollerConfigurator.apply(mIntakeRollerConfig);
+
+        mEncoderSim = new SparkAbsoluteEncoderSim(mIntakeArmMotor);
+        mArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), getArmGearRatio(), SingleJointedArmSim.estimateMOI(getArmCenterOfGravityDistance(), getArmMass()), getArmCenterOfGravityDistance(), Units.degreesToRadians(getMinimumEverReasonableAngle()), Units.degreesToRadians(getMaximumEverReasonableAngle()),true, 0.0, 0);
     }
 
     /**
@@ -287,6 +297,10 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
      */
     protected abstract double getMaximumEverReasonableAngle();
 
+    protected abstract double getArmGearRatio();
+    protected abstract double getArmCenterOfGravityDistance();
+    protected abstract double getArmMass();
+
 
     /*
      * FUNCTION CALLS TO DO THINGS
@@ -375,6 +389,12 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
      */
     public boolean isDisabled(){
         return mArmState == MotorizedIntakeArmState.kDisabled;
+    }
+
+    @Override
+    public void simulationPeriodic()
+    {
+
     }
 
     @Override
