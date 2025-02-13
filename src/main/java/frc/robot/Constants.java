@@ -19,8 +19,9 @@ import swervelib.math.Matter;
 public final class Constants
 {
 
-  public static final double ROBOT_MASS = 63.5029; // 32lbs * kg per pound
-  public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(7.5)), ROBOT_MASS);
+  public static final double ROBOT_MASS = Units.lbsToKilograms(130.839);
+  //public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(7.5)), ROBOT_MASS);
+  public static final Matter CHASSIS    = new Matter(new Translation3d(Units.inchesToMeters(.833), Units.inchesToMeters(.465), Units.inchesToMeters(7.77)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   public static final double MAX_SPEED  = Units.feetToMeters(14.5);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
@@ -37,6 +38,7 @@ public final class Constants
 
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
+    public static final double PANIC_THRESHOLD_DEGREES = 45.0;
   }
 
   public static class OperatorConstants
@@ -58,6 +60,9 @@ public final class Constants
     public static final double ELEVATOR_SPEED_TOLERANCE = 10.0; //inches per second
     public static final double ELEVATOR_MIN_HEIGHT = 6.75; //TODO: SET
     public static final double ELEVATOR_MAX_HEIGHT = 80.0; //TODO: SET
+    public static final double ELEVATOR_PARK_SERVO_BRAKE_ANGLE = 180.0;
+    public static final double ELEVATOR_PARK_SERVO_DISENGAGE_ANGLE = 0.0;
+    public static final double ELEVATOR_PARK_SERVO_ANGLE_TOLERANCE = 5.0;
   }
 
   public static class AlgaeClawConstants
@@ -89,6 +94,9 @@ public final class Constants
       public static final double MOVING_P_GAIN = 0.0;
       public static final double MOVING_I_GAIN = 0.0;
       public static final double MOVING_D_GAIN = 0.0;
+      public static final double ARM_GEAR_RATIO = 75.00; // 75:1
+      public static final double ARM_CENTER_OF_MASS_DISTANCE = Units.inchesToMeters(Math.hypot(1.8, 2.345));
+      public static final double ARM_MASS = Units.lbsToKilograms(6.358);
     }
 
     public static class ClawOpenCloseConstants
@@ -100,6 +108,6 @@ public final class Constants
       public static final double MOVING_I_GAIN = 0.0;
       public static final double MOVING_D_GAIN = 0.0;
     }
-    public static final double ARM_GEAR_RATIO = 75.00; // 75:1
+
   }
 }

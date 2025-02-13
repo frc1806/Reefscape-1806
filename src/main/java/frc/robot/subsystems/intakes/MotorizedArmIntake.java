@@ -27,9 +27,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 
 public abstract class MotorizedArmIntake extends SubsystemBase{
@@ -394,7 +396,11 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
     @Override
     public void simulationPeriodic()
     {
-
+        mArmSim.setInput(mIntakeArmMotor.getAppliedOutput() * RobotController.getInputVoltage());
+        mArmSim.update(Robot.kDefaultPeriod);
+        mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
+        mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+        SmartDashboard.putNumber(getIntakeName() + "/Simulation/ArmPosition", Units.radiansToDegrees(mArmSim.getAngleRads()));
     }
 
     @Override

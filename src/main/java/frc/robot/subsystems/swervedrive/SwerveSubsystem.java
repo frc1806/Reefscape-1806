@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.ReefscapePointsHelper;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -340,6 +341,8 @@ public class SwerveSubsystem extends SubsystemBase
         edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
                                      );
   }
+
+
 
   /**
    * Drive with {@link SwerveSetpointGenerator} from 254, implemented by PathPlanner.
@@ -773,6 +776,16 @@ public class SwerveSubsystem extends SubsystemBase
   public Rotation2d getPitch()
   {
     return swerveDrive.getPitch();
+  }
+
+  public Rotation2d getRoll()
+  {
+    return swerveDrive.getRoll();
+  }
+
+  public boolean isPanicSituation()
+  {
+    return Math.hypot(getPitch().getDegrees(), getRoll().getDegrees()) > Constants.DrivebaseConstants.PANIC_THRESHOLD_DEGREES;
   }
 
   /**

@@ -13,12 +13,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.SnapAnglesHelper.FieldSnapAngles;
+import frc.robot.commands.EverythingToHome;
+import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.Elevator;
@@ -155,16 +158,14 @@ public class RobotContainer
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.b().whileTrue(
-          drivebase.driveToPose(
-              new Pose2d(new Translation2d(6.07, 0.56), Rotation2d.fromDegrees(-90)))
-                              );
+      //driverXbox.b().whileTrue(
+          //drivebase.driveToPose(()->ReefscapePointsHelper.getProcessorPose()));
       driverXbox.y().whileTrue(drivebase.aimAtReefContinuous(() -> driverXbox.getLeftY() * -1,() -> driverXbox.getLeftX() * -1));
-      driverXbox.start().whileTrue(new ElevatorToHeight(ElevatorConstants.ELEVATOR_MIN_HEIGHT));
-      driverXbox.back().whileTrue(new ElevatorToHeight(32.0));//TODO: Replace with an actual height or command we care about.
+      driverXbox.start().onTrue(new ElevatorMoveSequence(ElevatorConstants.ELEVATOR_MIN_HEIGHT));
+      driverXbox.back().onTrue(new ElevatorMoveSequence(32.0));//TODO: Replace with an actual height or command we care about.
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(new ElevatorToHeight(75.0)); //TODO: Replace with an actual height we care about.
-
+      driverXbox.rightBumper().onTrue(new ElevatorMoveSequence(75.0)); //TODO: Replace with an actual height we care about.
+      new Trigger(drivebase::isPanicSituation).onTrue(new EverythingToHome());
     }
 
   }

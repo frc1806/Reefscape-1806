@@ -26,6 +26,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeClawConstants;
 import frc.robot.Robot;
@@ -92,16 +93,21 @@ public class AlgaeClaw extends SubsystemBase{
         new SingleJointedArmSim(DCMotor.getNeoVortex(1), AlgaeClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, AlgaeClawConstants.ARM_MASS), AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(360), true, 0.0, 0.0);
     }
 
+    public double getAngle(){
+        return mClawAngleMotor.getAbsoluteEncoder().getPosition();
+    }
+
     @Override
     public void simulationPeriodic(){
         mArmSim.setInput(mClawAngleMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
         mArmSim.update(Robot.kDefaultPeriod);
         mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
         mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+        SmartDashboard.putNumber("AlgaeClaw/Simulation/SimAngle", getAngle());
     }
 
     @Override
     public void periodic(){
-
+        SmartDashboard.putNumber("AlgaeClaw/Angle", getAngle());
     }
 }
