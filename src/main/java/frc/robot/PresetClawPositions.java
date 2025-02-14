@@ -9,6 +9,8 @@ public enum PresetClawPositions {
     kHome(6.75, 0.0, 0.0),
     kAlgaeNetForward(75.0, 0.0, 135.0),
     kAlgaeNetBackward(75.0, 0.0, 45.0),
+    kAlgaeProcessForward(45.0, 0.0, 200.0),
+    kAlgaeProcessBackward(0, 0.0, 10.0),
     kAlgaeL3(43.7, 0.0, 200.0),
     kAlgaeL2(35.8, 0.0, 200.0),
     kCoralL4(75.0, 120.0, 0.0),

@@ -15,15 +15,18 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.SnapAnglesHelper.FieldSnapAngles;
+import frc.robot.commands.ClawsToPresetPosition;
 import frc.robot.commands.EverythingToHome;
 import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.commands.utility.GetAndRunCommand;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
@@ -42,6 +45,8 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve"));
+
+  private final ReefscapePointsHelper pointsHelper = new ReefscapePointsHelper(drivebase);
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
@@ -156,16 +161,24 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverXbox.povDown().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       //driverXbox.b().whileTrue(
           //drivebase.driveToPose(()->ReefscapePointsHelper.getProcessorPose()));
-      driverXbox.y().whileTrue(drivebase.aimAtReefContinuous(() -> driverXbox.getLeftY() * -1,() -> driverXbox.getLeftX() * -1));
-      driverXbox.start().onTrue(new ElevatorMoveSequence(ElevatorConstants.ELEVATOR_MIN_HEIGHT));
-      driverXbox.back().onTrue(new ElevatorMoveSequence(32.0));//TODO: Replace with an actual height or command we care about.
+      driverXbox.start().onTrue(new ClawsToPresetPosition(PresetClawPositions.kHome));
+      driverXbox.rightBumper().and(driverXbox.a()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeL2));
+      driverXbox.rightBumper().negate().and(driverXbox.a()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL2));
+      driverXbox.rightBumper().and(driverXbox.b()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeL3));
+      driverXbox.rightBumper().negate().and(driverXbox.b()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL3));
+      driverXbox.rightBumper().and(driverXbox.y()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeNetForward));
+      driverXbox.rightBumper().negate().and(driverXbox.y()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL4));
+      driverXbox.rightBumper().and(driverXbox.x()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeProcessBackward));
+      driverXbox.rightBumper().negate().and(driverXbox.x()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL1));
+
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(new ElevatorMoveSequence(75.0)); //TODO: Replace with an actual height we care about.
       new Trigger(drivebase::isPanicSituation).onTrue(new EverythingToHome());
+      driverXbox.povRight().whileTrue(new GetAndRunCommand(pointsHelper::getProcessorPathCommand));
+
     }
 
   }

@@ -239,25 +239,27 @@ public class SwerveSubsystem extends SubsystemBase
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
   }
-
+ 
   /**
    * Get the yaw to aim at the speaker.
    *
    * @return {@link Rotation2d} of which you need to achieve.
    */
+  /*
   public Rotation2d getReefYaw()
   {
     // Taken from PhotonUtils.getYawToPose()
     Translation2d diff = ReefscapePointsHelper.getCenterOfReef().minus(getPose().getTranslation());
     return new Rotation2d(diff.getX(), diff.getY());
   }
-
+  */
   /**
    * Aim the robot at the speaker.
    *
    * @param tolerance Tolerance in degrees.
    * @return Command to turn the robot to the speaker.
    */
+  /*
   public Command aimAtReef(double tolerance)
   {
     SwerveController controller = swerveDrive.getSwerveController();
@@ -270,7 +272,8 @@ public class SwerveSubsystem extends SubsystemBase
           drive(speeds);
         }).until(() -> Math.abs(getReefYaw().minus(getHeading()).getDegrees()) < tolerance);
   }
-
+ */
+/* 
   public Command aimAtReefContinuous(DoubleSupplier xTranslation, DoubleSupplier yTranslation)
   {
     SwerveController controller = swerveDrive.getSwerveController();
@@ -284,7 +287,7 @@ public class SwerveSubsystem extends SubsystemBase
           drive(speeds);
         });
   }
-
+  */
   /**
    * Aim the robot at the target returned by PhotonVision.
    *
