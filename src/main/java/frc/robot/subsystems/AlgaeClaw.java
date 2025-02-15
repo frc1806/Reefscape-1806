@@ -117,13 +117,13 @@ public class AlgaeClaw extends SubsystemBase{
 
     }
         public boolean isAtPosition(){
-
+           return Math.abs(getAngle() - mTargetAngle) < AlgaeClawConstants.ANGLE_TOLERANCE;
         }
         public double getAngle(){
 
         return mClawAngleMotor.getAbsoluteEncoder().getPosition();
 
         }
-        public 
+        
     
 }

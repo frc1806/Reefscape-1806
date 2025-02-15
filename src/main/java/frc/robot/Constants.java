@@ -81,6 +81,7 @@ public final class Constants
     public static final double ARM_GEAR_RATIO = 75.00; // 75:1
     public static final double ARM_CENTER_OF_MASS_DISTANCE = Units.inchesToMeters(Math.hypot(7.218, 3.194));
     public static final double ARM_MASS = Units.lbsToKilograms(3.832);
+    public static final double ANGLE_TOLERANCE = 1.5; 
 
   }
 
