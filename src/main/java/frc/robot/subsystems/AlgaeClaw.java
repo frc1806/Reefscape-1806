@@ -11,6 +11,7 @@ import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
@@ -46,6 +47,7 @@ public class AlgaeClaw extends SubsystemBase{
     private SparkFlex mClawAngleMotor;
     private SingleJointedArmSim mArmSim;
     private SparkAbsoluteEncoderSim mEncoderSim;
+    private double mTargetAngle;
 
     private AlgaeClaw() {
         mClawAngleMotor = new SparkFlex(RobotMap.ALGAE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
@@ -56,6 +58,7 @@ public class AlgaeClaw extends SubsystemBase{
         clawEncoderConfig.startPulseUs(1.0);
         clawEncoderConfig.endPulseUs(1024.0);
         clawEncoderConfig.inverted(false);
+        mTargetAngle = 0;
 
         //configure closed loop control of intake arm
         MAXMotionConfig clawMoveConfig = new MAXMotionConfig();
@@ -94,9 +97,6 @@ public class AlgaeClaw extends SubsystemBase{
         new SingleJointedArmSim(DCMotor.getNeoVortex(1), AlgaeClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, AlgaeClawConstants.ARM_MASS), AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(360), true, 0.0, 0.0);
     }
 
-    public double getAngle(){
-        return mClawAngleMotor.getAbsoluteEncoder().getPosition();
-    }
 
     public boolean hasGamePiece(){
         return RobotContainer.S_CARRIAGE_CANDI.getS2Closed().getValue();
@@ -115,4 +115,20 @@ public class AlgaeClaw extends SubsystemBase{
     public void periodic(){
         SmartDashboard.putNumber("AlgaeClaw/Angle", getAngle());
     }
+    public void goToPosition(double angle){
+        mClawAngleMotor.getClosedLoopController().setReference(angle, ControlType.kMAXMotionPositionControl);
+        mTargetAngle = angle;
+
+
+    }
+        public boolean isAtPosition(){
+
+        }
+        public double getAngle(){
+
+        return mClawAngleMotor.getAbsoluteEncoder().getPosition();
+
+        }
+        public 
+    
 }
