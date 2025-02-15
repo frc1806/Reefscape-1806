@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
@@ -22,6 +23,7 @@ import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SmartMotionConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -56,6 +58,8 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
     private double mDesiredArbitraryPosition;
     private SingleJointedArmSim mArmSim;
     private SparkAbsoluteEncoderSim mEncoderSim;
+    private DCMotor mArmMotorSim;
+    private SparkMaxSim mArmSparkMaxSim;
 
     protected MotorizedArmIntake()
     {
@@ -72,6 +76,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         AbsoluteEncoderConfig armEncoderConfig = new AbsoluteEncoderConfig();
         //configure through bore encoder. We will Zero them in rev's hardware client.
         armEncoderConfig.positionConversionFactor(360);
+        armEncoderConfig.velocityConversionFactor(360.0 / 60.0);
         armEncoderConfig.startPulseUs(1.0);
         armEncoderConfig.endPulseUs(1024.0);
         armEncoderConfig.inverted(isIntakeArmEncoderInverted());
@@ -79,13 +84,18 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         //configure closed loop control of intake arm
         MAXMotionConfig armMoveConfig = new MAXMotionConfig();
         armMoveConfig.allowedClosedLoopError(getMaximumAllowedClosedLoopError());
+        armMoveConfig.allowedClosedLoopError(getMaximumAllowedClosedLoopError(), ClosedLoopSlot.kSlot1);
         armMoveConfig.maxAcceleration(getMaxMotionMaxAcceleration());
+        armMoveConfig.maxAcceleration(getMaxMotionMaxAcceleration(), ClosedLoopSlot.kSlot1);
         armMoveConfig.maxVelocity(getMaxMotionMaxVelocity());
+        armMoveConfig.maxVelocity(getMaxMotionMaxVelocity(), ClosedLoopSlot.kSlot1);    
         armMoveConfig.positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal);
+        armMoveConfig.positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal, ClosedLoopSlot.kSlot1);
         
         ClosedLoopConfig armClosedLoopConfig = new ClosedLoopConfig();
         armClosedLoopConfig.pid(getMovingPGain(), getMovingIGain(), getMovingDGain(), ClosedLoopSlot.kSlot0);
         armClosedLoopConfig.pid(getHoldingPGain(), getHoldingIGain(), getHoldingDGain(), ClosedLoopSlot.kSlot1);
+        armClosedLoopConfig.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         armClosedLoopConfig.apply(armMoveConfig);
 
         mIntakeConfig.apply(armEncoderConfig);
@@ -110,8 +120,11 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         mIntakeRollerConfig.withMotorOutput(rollerOutputConfig);
         intakeRollerConfigurator.apply(mIntakeRollerConfig);
 
-        mEncoderSim = new SparkAbsoluteEncoderSim(mIntakeArmMotor);
-        mArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), getArmGearRatio(), SingleJointedArmSim.estimateMOI(getArmCenterOfGravityDistance(), getArmMass()), getArmCenterOfGravityDistance(), Units.degreesToRadians(getMinimumEverReasonableAngle()), Units.degreesToRadians(getMaximumEverReasonableAngle()),true, 0.0, 0);
+
+        mArmMotorSim = DCMotor.getNEO(1);
+        mArmSparkMaxSim = new SparkMaxSim(mIntakeArmMotor, mArmMotorSim);
+        mEncoderSim = mArmSparkMaxSim.getAbsoluteEncoderSim();
+        mArmSim = new SingleJointedArmSim(mArmMotorSim, getArmGearRatio(), SingleJointedArmSim.estimateMOI(getArmCenterOfGravityDistance(), getArmMass()), getArmCenterOfGravityDistance(), Units.degreesToRadians(getMinimumEverReasonableAngle()), Units.degreesToRadians(getMaximumEverReasonableAngle()),true, 0.0, 0.0, 0.0);
     }
 
     /**
@@ -396,11 +409,20 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
     @Override
     public void simulationPeriodic()
     {
-        mArmSim.setInput(mIntakeArmMotor.getAppliedOutput() * RobotController.getInputVoltage());
+        double volts = RobotController.getInputVoltage();
+
+        mArmSim.setInputVoltage(mArmSparkMaxSim.getAppliedOutput() * volts);
         mArmSim.update(Robot.kDefaultPeriod);
-        mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
-        mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+        mArmSparkMaxSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
+        mArmSparkMaxSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+        mArmSparkMaxSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()), volts, Robot.kDefaultPeriod);
+        //mArmSparkMaxSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()), volts, Robot.kDefaultPeriod);
+        //mArmSparkMaxSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
+        //mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
+        //mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+        //mEncoderSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()), Robot.kDefaultPeriod);
         SmartDashboard.putNumber(getIntakeName() + "/Simulation/ArmPosition", Units.radiansToDegrees(mArmSim.getAngleRads()));
+        SmartDashboard.putNumber(getIntakeName() + "/Simulation/ArmCurrentDraw", mArmSim.getCurrentDrawAmps());
     }
 
     @Override
@@ -408,11 +430,11 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
     {
         double armPosition = mIntakeArmMotor.getAbsoluteEncoder().getPosition();
         //Check for faults
-        if(mArmState != MotorizedIntakeArmState.kDisabled && (armPosition> getMaximumEverReasonableAngle() || armPosition < getMinimumEverReasonableAngle()))
+        /*if(mArmState != MotorizedIntakeArmState.kDisabled && (armPosition> getMaximumEverReasonableAngle() || armPosition < getMinimumEverReasonableAngle()))
         {
             mArmState = MotorizedIntakeArmState.kDisabled; //kill it, live to play another match unless it's already FUBAR. At least we might save the motor.
             System.out.println("!!INTAKE FAULT!! Intake:" + getIntakeName() + " has achieved an arm angle of:" + armPosition + " . Disabling.");
-        }
+        }*/
         
 
         //Run the intake arm based on the current state
@@ -478,6 +500,9 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         //Update smart dashbaord
         SmartDashboard.putNumber(getIntakeName() + "/arm position", armPosition);
         SmartDashboard.putString(getIntakeName() + "/state", mArmState.name());
+        SmartDashboard.putNumber(getIntakeName() + "/armMotorAppliedOutput", mIntakeArmMotor.getAppliedOutput());
+        SmartDashboard.putNumber(getIntakeName() + "/rollerMotorOutputVolts", mIntakeRollerMotor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber(getIntakeName() + "/armVelocity", mIntakeArmMotor.getAbsoluteEncoder().getVelocity());
     }
 
 }

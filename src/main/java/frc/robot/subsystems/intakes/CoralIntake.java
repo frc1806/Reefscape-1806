@@ -67,7 +67,7 @@ public class CoralIntake extends MotorizedArmIntake{
 
     @Override
     protected double getMovingPGain() {
-        return 1.0/30.0;
+        return 1.0/15.0;
     }
 
     @Override
@@ -82,12 +82,12 @@ public class CoralIntake extends MotorizedArmIntake{
 
     @Override
     protected double getMaxMotionMaxVelocity() {
-        return 180.0;
+        return 400.0;
     }
 
     @Override
     protected double getMaxMotionMaxAcceleration() {
-        return 360.0;
+        return 400.0;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class CoralIntake extends MotorizedArmIntake{
 
     @Override
     protected double getHoldingPGain() {
-        return 1.0/90.0;
+        return 1.0/60.0;
     }
 
     @Override

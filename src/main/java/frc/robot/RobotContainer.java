@@ -23,6 +23,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.SnapAnglesHelper.FieldSnapAngles;
 import frc.robot.commands.ClawsToPresetPosition;
 import frc.robot.commands.EverythingToHome;
+import frc.robot.commands.coralintake.CoralIntakeIntake;
 import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
@@ -174,6 +175,8 @@ public class RobotContainer
       driverXbox.rightBumper().negate().and(driverXbox.y()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL4));
       driverXbox.rightBumper().and(driverXbox.x()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeProcessBackward));
       driverXbox.rightBumper().negate().and(driverXbox.x()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL1));
+
+      driverXbox.rightTrigger().whileTrue(new CoralIntakeIntake());
 
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       new Trigger(drivebase::isPanicSituation).onTrue(new EverythingToHome());
