@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeClawConstants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 
 public class AlgaeClaw extends SubsystemBase{
@@ -96,6 +97,10 @@ public class AlgaeClaw extends SubsystemBase{
         new SingleJointedArmSim(DCMotor.getNeoVortex(1), AlgaeClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, AlgaeClawConstants.ARM_MASS), AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(360), true, 0.0, 0.0);
     }
 
+
+    public boolean hasGamePiece(){
+        return RobotContainer.S_CARRIAGE_CANDI.getS2Closed().getValue();
+    }
 
     @Override
     public void simulationPeriodic(){
