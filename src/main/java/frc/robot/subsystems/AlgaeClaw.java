@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeClawConstants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 
 public class AlgaeClaw extends SubsystemBase{
@@ -95,6 +96,10 @@ public class AlgaeClaw extends SubsystemBase{
 
     public double getAngle(){
         return mClawAngleMotor.getAbsoluteEncoder().getPosition();
+    }
+
+    public boolean hasGamePiece(){
+        return RobotContainer.S_CARRIAGE_CANDI.getS2Closed().getValue();
     }
 
     @Override

@@ -97,6 +97,7 @@ public final class Constants
       public static final double ARM_GEAR_RATIO = 75.00; // 75:1
       public static final double ARM_CENTER_OF_MASS_DISTANCE = Units.inchesToMeters(Math.hypot(1.8, 2.345));
       public static final double ARM_MASS = Units.lbsToKilograms(6.358);
+      public static final int CURRENT_LIMIT = 20;
     }
 
     public static class ClawOpenCloseConstants
@@ -107,7 +108,13 @@ public final class Constants
       public static final double MOVING_P_GAIN = 0.0;
       public static final double MOVING_I_GAIN = 0.0;
       public static final double MOVING_D_GAIN = 0.0;
+      public static final int CURRENT_LIMIT = 20;
+      public static final double OPEN_ANGLE = 75;
+      public static final double CLOSE_ANGLE = 70;
+      public static final double ANGLE_TOLERANCE = 5.0;
     }
-
+    public static final double CORAL_CLAW_ANGLE_TOLERANCE = 1.5;
+    public static final double ROLLER_IN_VOLTAGE = 8.0;
+    public static final double ROLLER_OUT_VOLTAGE = -4.0;
   }
 }
