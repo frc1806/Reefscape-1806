@@ -209,7 +209,7 @@ public class RobotContainer
     NamedCommands.registerCommand("L2Coral", new ClawsToPresetPosition(PresetClawPositions.kCoralL2));
     NamedCommands.registerCommand("L3Algae", new ClawsToPresetPosition(PresetClawPositions.kAlgaeL3));
     NamedCommands.registerCommand("L2Algae", new ClawsToPresetPosition(PresetClawPositions.kAlgaeL2));
-    NamedCommands.registerCommand("CoralIntake", new CoralIntakeIntake());
+    NamedCommands.registerCommand("CoralIntake", CORAL_INTAKE_SEQUENCE);
     NamedCommands.registerCommand("AlgaeClawIn", new AlgaeClawRunRollersIn());
     NamedCommands.registerCommand("AlgaeOut", new ParallelDeadlineGroup(new WaitCommand(200),new AlgaeClawRunRollersOut()));
     NamedCommands.registerCommand("CoralOut", new ParallelDeadlineGroup(new WaitCommand(200),new CoralClawRunRollersOut()));

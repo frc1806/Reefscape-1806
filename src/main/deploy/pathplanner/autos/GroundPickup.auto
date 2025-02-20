@@ -5,6 +5,25 @@
     "data": {
       "commands": [
         {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "GroundPickupStart"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "GroundPickupStart"

@@ -97,8 +97,11 @@ public class CoralClaw extends SubsystemBase {
     clawOpenCloseConfig.smartCurrentLimit(CoralClawConstants.ClawRotationConstants.CURRENT_LIMIT);
     clawOpenCloseConfig.inverted(AlgaeClawConstants.CLAW_INTAKE_ARM_INVERTED);
     clawOpenCloseConfig.idleMode(IdleMode.kBrake);
+
+    mOpenClaw = new SparkFlex(RobotMap.CORAL_CLAW_OPEN_CLOSE_ID, MotorType.kBrushless);
     mOpenClaw.configure(clawOpenCloseConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    mRollerMotor = new TalonFX(RobotMap.ALGAE_CLAW_ROLLER_MOTOR_ID);
      TalonFXConfigurator intakeRollerConfigurator = mRollerMotor.getConfigurator();
         CurrentLimitsConfigs intakeRollerCurrentConfigs = new CurrentLimitsConfigs();
         intakeRollerCurrentConfigs.withSupplyCurrentLimit(AlgaeClawConstants.INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT);

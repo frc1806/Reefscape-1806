@@ -93,7 +93,7 @@ public class AlgaeClaw extends SubsystemBase{
         mEncoderSim = new SparkAbsoluteEncoderSim(mClawAngleMotor);
 
         mArmSim = 
-        new SingleJointedArmSim(DCMotor.getNeoVortex(1), AlgaeClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, AlgaeClawConstants.ARM_MASS), AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(360), true, 0.0, 0.0);
+        new SingleJointedArmSim(DCMotor.getNeoVortex(1), AlgaeClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, AlgaeClawConstants.ARM_MASS), AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(360), true, 0.0, 0.0, 0.0);
     }
 
 
