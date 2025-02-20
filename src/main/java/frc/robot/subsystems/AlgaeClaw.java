@@ -4,13 +4,12 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -130,5 +129,15 @@ public class AlgaeClaw extends SubsystemBase{
 
         }
         
-    
+    public void runRollersIn(){
+        mClawRollerMotor.setControl(new VoltageOut(AlgaeClawConstants.ALGAE_CLAW_ROLLER_IN_VOLTAGE));
+    }
+
+    public void stopRollers(){
+        mClawRollerMotor.stopMotor();
+    }
+
+    public void runRollersOut(){
+        mClawRollerMotor.setControl(new VoltageOut(AlgaeClawConstants.ALGAE_CLAW_ROLLER_OUT_VOLTAGE));
+    }
 }
