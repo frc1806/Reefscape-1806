@@ -7,6 +7,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.PresetClawPositions;
+import frc.robot.commands.algaeclaw.AlgaeClawToAngle;
+import frc.robot.commands.coralclaw.CoralClawToAngle;
 import frc.robot.commands.elevator.ElevatorMoveSequence;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -18,9 +20,9 @@ public class ClawsToPresetPosition extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      // new ParallelCommandGroup(null), //TODO: Claws to home
-      new ElevatorMoveSequence(preset.getElevatorHeight()) //,
-      //new ParallelCommandGroup(null) //TODO: Claws to desired position
+      new ParallelCommandGroup(new CoralClawToAngle(PresetClawPositions.kHome.getCoralClawAngle()), new AlgaeClawToAngle(PresetClawPositions.kHome.getAlgaeClawAngle())),
+      new ElevatorMoveSequence(preset.getElevatorHeight()),
+      new ParallelCommandGroup(new CoralClawToAngle(preset.getCoralClawAngle()), new AlgaeClawToAngle(preset.getAlgaeClawAngle()))
     );
   }
 

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.hardware.CANdi;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,7 +17,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -24,6 +28,11 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.SnapAnglesHelper.FieldSnapAngles;
 import frc.robot.commands.ClawsToPresetPosition;
 import frc.robot.commands.EverythingToHome;
+import frc.robot.commands.algaeclaw.AlgaeClawRunRollersIn;
+import frc.robot.commands.algaeclaw.AlgaeClawRunRollersOut;
+import frc.robot.commands.coralclaw.CoralClawCloseClaw;
+import frc.robot.commands.coralclaw.CoralClawOpenClaw;
+import frc.robot.commands.coralclaw.CoralClawRunRollersOut;
 import frc.robot.commands.coralintake.CoralIntakeIntake;
 import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
@@ -42,6 +51,10 @@ import java.io.File;
 public class RobotContainer
 {
   public static final CANdi S_CARRIAGE_CANDI = new CANdi(RobotMap.ELEVATOR_CANDI_ID);
+
+  public static final Command CORAL_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new CoralClawOpenClaw(), new CoralIntakeIntake(), new CoralClawCloseClaw());
+  public static final Command ALGAE_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new AlgaeClawRunRollersIn());
+  public static final Command CORRAL_SCORE_SEQUENCE = new SequentialCommandGroup(new ParallelDeadlineGroup(new WaitCommand(.2), new CoralClawRunRollersOut()), new ClawsToPresetPosition(PresetClawPositions.kHome)); 
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
@@ -69,6 +82,7 @@ public class RobotContainer
                                                                  driverXbox.getHID()::getXButtonPressed,
                                                                  driverXbox.getHID()::getBButtonPressed);
 
+  AutoBuilder mAutoBuilder = new AutoBuilder();
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
@@ -188,6 +202,20 @@ public class RobotContainer
 
   }
 
+  public void setupNamedCommands(){
+    NamedCommands.registerCommand("HomeClaws", new ClawsToPresetPosition(PresetClawPositions.kHome));
+    NamedCommands.registerCommand("L4Coral", new ClawsToPresetPosition(PresetClawPositions.kCoralL4));
+    NamedCommands.registerCommand("L3Coral", new ClawsToPresetPosition(PresetClawPositions.kCoralL3));
+    NamedCommands.registerCommand("L2Coral", new ClawsToPresetPosition(PresetClawPositions.kCoralL2));
+    NamedCommands.registerCommand("L3Algae", new ClawsToPresetPosition(PresetClawPositions.kAlgaeL3));
+    NamedCommands.registerCommand("L2Algae", new ClawsToPresetPosition(PresetClawPositions.kAlgaeL2));
+    NamedCommands.registerCommand("CoralIntake", new CoralIntakeIntake());
+    NamedCommands.registerCommand("AlgaeClawIn", new AlgaeClawRunRollersIn());
+    NamedCommands.registerCommand("AlgaeOut", new ParallelDeadlineGroup(new WaitCommand(200),new AlgaeClawRunRollersOut()));
+    NamedCommands.registerCommand("CoralOut", new ParallelDeadlineGroup(new WaitCommand(200),new CoralClawRunRollersOut()));
+    NamedCommands.registerCommand(null, closedAbsoluteDriveAdv);
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -195,7 +223,8 @@ public class RobotContainer
    */
   public Command getAutonomousCommand()
   {
-    //TODO setup path planner autos
+    
+    
     // An example command will be run in autonomous
     return drivebase.getAutonomousCommand("GroundPickup");
   }
