@@ -16,7 +16,12 @@ public enum PresetClawPositions {
     kCoralL4(75.0, 120.0, 0.0),
     kCoralL3(50.0, 150.0, 0.0),
     kCoralL2(34.0, 150.0, 0.0),
-    kCoralL1(25, 180.0, 0.0);
+    kCoralL1(25, 180.0, 0.0),
+    kClawMotionTest(50.0, 0.0, 0.0),
+
+    kClimbPart1(21.0, 0.0, 180.0),
+    kClimbPart2(0, 0.0, 80.0);
+    
     
 
     private double mElevatorHeight;
