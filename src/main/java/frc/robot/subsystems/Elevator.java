@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.dyn4j.geometry.Matrix22;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.Constants.ElevatorConstants;
+
 
 public class Elevator extends SubsystemBase{
     private static final boolean IS_ELEVATOR_ENABLED = true;
@@ -89,7 +91,7 @@ public class Elevator extends SubsystemBase{
         MotorOutputConfigs outputConfigs = new MotorOutputConfigs();
         outputConfigs.withPeakForwardDutyCycle(1.0);
         outputConfigs.withPeakReverseDutyCycle(-1.0);
-        outputConfigs.withInverted(InvertedValue.Clockwise_Positive);
+        outputConfigs.withInverted(InvertedValue.CounterClockwise_Positive);
         motor1Configurator.apply(outputConfigs);
         
         SoftwareLimitSwitchConfigs softLimitConfigs  = new SoftwareLimitSwitchConfigs();
@@ -111,7 +113,7 @@ public class Elevator extends SubsystemBase{
         mElevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2), ElevatorConstants.ELEVATOR_GEAR_RATIO, Units.lbsToKilograms(85), Units.inchesToMeters(ElevatorConstants.ELEVATOR_DRUM_DIAMETER/2.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MAX_HEIGHT/3.0), true, Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0));
         mElevator1.setPosition(ElevatorConstants.ELEVATOR_MIN_HEIGHT);
 
-        mBrakeServo = new Servo(0);
+        mBrakeServo = new Servo(9);
         disengageParkingBrake();
      }
 
@@ -200,6 +202,12 @@ public class Elevator extends SubsystemBase{
         SmartDashboard.putNumber("Elevator/Simulation/CurrentDraw", mElevatorSim.getCurrentDrawAmps());
         SmartDashboard.putNumber("Elevator/Simulation/ElevatorVelocity", Units.metersToInches(3.0 * mElevatorSim.getVelocityMetersPerSecond()));
 
+    }
+
+    public void addToOrchestra(Orchestra orchestra)
+    {
+        orchestra.addInstrument(mElevator1);
+        orchestra.addInstrument(mElevator2);
     }
 
     @Override

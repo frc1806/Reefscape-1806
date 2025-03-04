@@ -60,8 +60,8 @@ public final class Constants
     public static final double ELEVATOR_SPEED_TOLERANCE = 10.0; //inches per second
     public static final double ELEVATOR_MIN_HEIGHT = 6.75; //TODO: SET
     public static final double ELEVATOR_MAX_HEIGHT = 80.0; //TODO: SET
-    public static final double ELEVATOR_PARK_SERVO_BRAKE_ANGLE = 180.0;
-    public static final double ELEVATOR_PARK_SERVO_DISENGAGE_ANGLE = 0.0;
+    public static final double ELEVATOR_PARK_SERVO_BRAKE_ANGLE = 0.0;
+    public static final double ELEVATOR_PARK_SERVO_DISENGAGE_ANGLE = 60.0;
     public static final double ELEVATOR_PARK_SERVO_ANGLE_TOLERANCE = 5.0;
   }
 

@@ -13,11 +13,11 @@ public class RobotMap {
 
     //CORAL INTAKE
     public static final int CORAL_INTAKE_ROLLER_ID = 30; //Kraken (TalonFX)
-    public static final int CORAL_INTAKE_ARM_ID = 31; //NEO Vortex (Spark Flex)
+    public static final int CORAL_INTAKE_ARM_ID = 31; //NEO (Spark Max)
 
     //ALGAE CLAW
 
-    public static final int ALGAE_CLAW_ANGLE_MOTOR_ID = 41; //NEO (Spark Max)
+    public static final int ALGAE_CLAW_ANGLE_MOTOR_ID = 41;  //NEO Vortex (Spark Flex)
     public static final int ALGAE_CLAW_ROLLER_MOTOR_ID = 40; //Kraken (TalonFX)
 
     //ALGAE INTAKE

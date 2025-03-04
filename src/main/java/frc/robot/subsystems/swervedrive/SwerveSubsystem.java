@@ -6,6 +6,8 @@ package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -51,6 +53,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -807,5 +810,23 @@ public class SwerveSubsystem extends SubsystemBase
   public SwerveDrive getSwerveDrive()
   {
     return swerveDrive;
+  }
+
+  public void addToOrchestra(Orchestra orchestra)
+  {
+    for(SwerveModule module: swerveDrive.getModules())
+    {
+      orchestra.addInstrument((TalonFX) module.getDriveMotor().getMotor());
+    }
+
+  }
+
+  public void stop()
+  {
+    for(SwerveModule module : swerveDrive.getModules())
+    {
+      module.getDriveMotor().set(0.0);
+      module.getAngleMotor().set(0.0);
+    }
   }
 }

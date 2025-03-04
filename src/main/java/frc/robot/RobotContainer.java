@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -45,6 +46,7 @@ import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
 import frc.robot.commands.elevator.EngageBrakeAtDesiredPosition;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.commands.swervedrive.drivebase.StopDrive;
 import frc.robot.commands.utility.GetAndRunCommand;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -66,7 +68,8 @@ public class RobotContainer
     CoralIntakeArmTest,
     CoralClawAngleTest,
     CoralClawOpenCloseTest,
-    AlgaeClawAngleTest
+    AlgaeClawAngleTest,
+    PlayMusic
   }
 
   public static final SendableChooser<TEST_MODES> TEST_MODE_CHOOSER = new SendableChooser<>();
@@ -81,8 +84,10 @@ public class RobotContainer
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   final         CommandXboxController operatorXbox = new CommandXboxController(1);
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+  public static final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve"));
+
+  private final Orchestra orchestra = new Orchestra();
 
   private final ReefscapePointsHelper pointsHelper = new ReefscapePointsHelper(drivebase);
   // Applies deadbands and inverts controls because joysticks
@@ -172,6 +177,10 @@ public class RobotContainer
       TEST_MODE_CHOOSER.addOption(testMode.name(), testMode);
     }
     SmartDashboard.putData(TEST_MODE_CHOOSER);
+
+    orchestra.loadMusic("thethingthatshouldnotbe.chrp");
+    Elevator.GetInstance().addToOrchestra(orchestra);
+    drivebase.addToOrchestra(orchestra);
   }
 
   /**
@@ -195,59 +204,69 @@ public class RobotContainer
     }
     if (DriverStation.isTest())
     {
-      switch(TEST_MODE_CHOOSER.getSelected())
+      if(TEST_MODE_CHOOSER.getSelected() != null)
       {
-        case AlgaeClawAngleTest:
-          Command algaeClawSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
-          driverXbox.a().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(0.0)));
-          driverXbox.b().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(45.0)));
-          driverXbox.y().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(120.0)));
-          driverXbox.x().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(200.0)));
-          break;
-        case CoralClawAngleTest:
-          Command coralClawSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
-          driverXbox.a().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(0.0)));
-          driverXbox.b().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(120.0)));
-          driverXbox.y().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(180.0)));
-          break;
-        case CoralClawOpenCloseTest:
-          Command coralClawOpenSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
-          driverXbox.a().onTrue(coralClawOpenSetupBase.andThen(new CoralClawOpenClaw()));
-          driverXbox.b().onTrue(coralClawOpenSetupBase.andThen(new CoralClawCloseClaw()));
-          break;
-        case CoralIntakeArmTest:
-          driverXbox.a().onTrue(new CoralIntakeIntake());
-          driverXbox.b().onTrue(new CoralIntakeRetract());
-          break;
-        case ElevatorBrakeTest:
-          driverXbox.a().onTrue(new EngageBrakeAtDesiredPosition());
-          driverXbox.b().onTrue(new DisengageBrake());
-          break;
-        case ElevatorFullTest:
-          driverXbox.a().onTrue(new ElevatorMoveSequence(PresetClawPositions.kHome.getElevatorHeight()));
-          driverXbox.b().onTrue(new ElevatorMoveSequence(PresetClawPositions.kCoralL3.getElevatorHeight()));
-          driverXbox.y().onTrue(new ElevatorMoveSequence(PresetClawPositions.kCoralL4.getElevatorHeight()));
-          break;
-        case ElevatorMotionTest:
-          driverXbox.a().onTrue(new ElevatorToHeight(PresetClawPositions.kHome.getElevatorHeight()));
-          driverXbox.b().onTrue(new ElevatorToHeight(PresetClawPositions.kCoralL3.getElevatorHeight()));
-          driverXbox.y().onTrue(new ElevatorToHeight(PresetClawPositions.kCoralL4.getElevatorHeight()));
-          break;
-        case SwerveTest:
-          drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-
-          driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
-          driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-          driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-          driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-          driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-          driverXbox.leftBumper().onTrue(Commands.none());
-          driverXbox.rightBumper().onTrue(Commands.none());
-          break;
-        default:
-          break;
-        
+        if(TEST_MODE_CHOOSER.getSelected() != TEST_MODES.SwerveTest)
+        {
+          drivebase.setDefaultCommand(new StopDrive());
+        }
+        switch(TEST_MODE_CHOOSER.getSelected())
+        {
+          case AlgaeClawAngleTest:
+            Command algaeClawSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
+            driverXbox.a().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(0.0)));
+            driverXbox.b().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(45.0)));
+            driverXbox.y().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(120.0)));
+            driverXbox.x().onTrue(algaeClawSetupBase.andThen(new AlgaeClawToAngle(200.0)));
+            break;
+          case CoralClawAngleTest:
+            Command coralClawSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
+            driverXbox.a().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(0.0)));
+            driverXbox.b().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(120.0)));
+            driverXbox.y().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(180.0)));
+            break;
+          case CoralClawOpenCloseTest:
+            Command coralClawOpenSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
+            driverXbox.a().onTrue(coralClawOpenSetupBase.andThen(new CoralClawOpenClaw()));
+            driverXbox.b().onTrue(coralClawOpenSetupBase.andThen(new CoralClawCloseClaw()));
+            break;
+          case CoralIntakeArmTest:
+            driverXbox.a().onTrue(new CoralIntakeIntake());
+            driverXbox.b().onTrue(new CoralIntakeRetract());
+            break;
+          case ElevatorBrakeTest:
+            driverXbox.a().onTrue(new EngageBrakeAtDesiredPosition());
+            driverXbox.b().onTrue(new DisengageBrake());
+            break;
+          case ElevatorFullTest:
+            driverXbox.a().onTrue(new ElevatorMoveSequence(PresetClawPositions.kHome.getElevatorHeight()));
+            driverXbox.b().onTrue(new ElevatorMoveSequence(PresetClawPositions.kCoralL3.getElevatorHeight()));
+            driverXbox.y().onTrue(new ElevatorMoveSequence(PresetClawPositions.kCoralL4.getElevatorHeight()));
+            break;
+          case ElevatorMotionTest:
+            driverXbox.a().onTrue(new ElevatorToHeight(PresetClawPositions.kHome.getElevatorHeight()));
+            driverXbox.b().onTrue(new ElevatorToHeight(PresetClawPositions.kCoralL3.getElevatorHeight()));
+            driverXbox.y().onTrue(new ElevatorToHeight(PresetClawPositions.kCoralL4.getElevatorHeight()));
+            break;
+          case SwerveTest:
+            drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+  
+            driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
+            driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+            driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+            driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+            driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+            driverXbox.leftBumper().onTrue(Commands.none());
+            driverXbox.rightBumper().onTrue(Commands.none());
+            break;
+          case PlayMusic:
+            orchestra.play();
+          default:
+            break;
+          
+        }
       }
+      
 
     } else
     {
