@@ -45,6 +45,7 @@ import frc.robot.commands.elevator.DisengageBrake;
 import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
 import frc.robot.commands.elevator.EngageBrakeAtDesiredPosition;
+import frc.robot.commands.swervedrive.WaitForBackAway;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.commands.swervedrive.drivebase.StopDrive;
 import frc.robot.commands.utility.GetAndRunCommand;
@@ -77,8 +78,8 @@ public class RobotContainer
   public static final CANdi S_CARRIAGE_CANDI = new CANdi(RobotMap.ELEVATOR_CANDI_ID);
 
   public static final Command CORAL_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new CoralClawOpenClaw(), new CoralIntakeIntake(), new CoralClawCloseClaw());
-  public static final Command ALGAE_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new AlgaeClawRunRollersIn());
-  public static final Command CORRAL_SCORE_SEQUENCE = new SequentialCommandGroup(new ParallelDeadlineGroup(new WaitCommand(.2), new CoralClawRunRollersOut()), new ClawsToPresetPosition(PresetClawPositions.kHome)); 
+  public static final Command ALGAE_INTAKE_SEQUENCE = new SequentialCommandGroup( new AlgaeClawRunRollersIn(), new WaitForBackAway(), new ClawsToPresetPosition(PresetClawPositions.kHome));
+  public static final Command CORRAL_SCORE_SEQUENCE = new SequentialCommandGroup(new ParallelDeadlineGroup(new WaitCommand(.2), new CoralClawRunRollersOut()), new WaitForBackAway(), new ClawsToPresetPosition(PresetClawPositions.kHome)); 
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);

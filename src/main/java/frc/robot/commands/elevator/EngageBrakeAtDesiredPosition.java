@@ -4,16 +4,20 @@
 
 package frc.robot.commands.elevator;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class EngageBrakeAtDesiredPosition extends Command {
   boolean hasEngaged;
+  Timer mTimer;
   /** Creates a new EngageBrake. */
   public EngageBrakeAtDesiredPosition() {
     addRequirements(Elevator.GetInstance());
     hasEngaged = false;
+    mTimer = new Timer();
   }
 
   // Called when the command is initially scheduled.
@@ -28,9 +32,12 @@ public class EngageBrakeAtDesiredPosition extends Command {
     {
       Elevator.GetInstance().engageParkingBrake();
       hasEngaged = true;
+      mTimer.start();
     }
     else{
       Elevator.GetInstance().disengageParkingBrake();
+      mTimer.stop();
+      mTimer.reset();
     }
   }
 
@@ -44,6 +51,6 @@ public class EngageBrakeAtDesiredPosition extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Elevator.GetInstance().isBrakeEngaged() && hasEngaged;
+    return (Elevator.GetInstance().isBrakeEngaged() && hasEngaged) && mTimer.hasElapsed(ElevatorConstants.ELEVATOR_PARK_SERVO_LOCK_UNLOCK_TIME);
   }
 }

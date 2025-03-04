@@ -63,6 +63,7 @@ public final class Constants
     public static final double ELEVATOR_PARK_SERVO_BRAKE_ANGLE = 0.0;
     public static final double ELEVATOR_PARK_SERVO_DISENGAGE_ANGLE = 60.0;
     public static final double ELEVATOR_PARK_SERVO_ANGLE_TOLERANCE = 5.0;
+    public static final double ELEVATOR_PARK_SERVO_LOCK_UNLOCK_TIME = 0.2;
   }
 
   public static class AlgaeClawConstants
