@@ -185,6 +185,11 @@ public class RobotContainer
       TEST_MODE_CHOOSER.addOption(testMode.name(), testMode);
     }
     SmartDashboard.putData("Test Mode", TEST_MODE_CHOOSER);
+
+    for (Songs song: Songs.values())
+    {
+      SONG_CHOOSER.addOption(song.name(), song);
+    }
     SmartDashboard.putData("Song", SONG_CHOOSER);
 
     Elevator.GetInstance().addToOrchestra(orchestra);
