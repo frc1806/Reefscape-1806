@@ -73,7 +73,14 @@ public class RobotContainer
     PlayMusic
   }
 
+  public enum Songs{
+    TheThingThatShouldNotBe,
+    StarSpangledBanner,
+    GoRollingAlong
+  }
+
   public static final SendableChooser<TEST_MODES> TEST_MODE_CHOOSER = new SendableChooser<>();
+  public static final SendableChooser<Songs> SONG_CHOOSER = new SendableChooser<>();
 
   public static final CANdi S_CARRIAGE_CANDI = new CANdi(RobotMap.ELEVATOR_CANDI_ID);
 
@@ -177,9 +184,9 @@ public class RobotContainer
     {
       TEST_MODE_CHOOSER.addOption(testMode.name(), testMode);
     }
-    SmartDashboard.putData(TEST_MODE_CHOOSER);
+    SmartDashboard.putData("Test Mode", TEST_MODE_CHOOSER);
+    SmartDashboard.putData("Song", SONG_CHOOSER);
 
-    orchestra.loadMusic("thethingthatshouldnotbe.chrp");
     Elevator.GetInstance().addToOrchestra(orchestra);
     drivebase.addToOrchestra(orchestra);
   }
@@ -261,7 +268,24 @@ public class RobotContainer
             driverXbox.rightBumper().onTrue(Commands.none());
             break;
           case PlayMusic:
-            orchestra.play();
+            if(SONG_CHOOSER.getSelected() != null)
+            {
+              switch(SONG_CHOOSER.getSelected())
+              {
+                case GoRollingAlong:
+                  orchestra.loadMusic("gorollingalong.chrp");
+                  break;
+                case StarSpangledBanner:
+                  orchestra.loadMusic("starspangledbanner.chrp");
+                  break;
+                default: //intentional no break to default to thing that should not be
+                case TheThingThatShouldNotBe:
+                  orchestra.loadMusic("thethingthatshouldnotbe.chrp");
+                  break;
+              }
+              orchestra.play();
+            }
+
           default:
             break;
           
