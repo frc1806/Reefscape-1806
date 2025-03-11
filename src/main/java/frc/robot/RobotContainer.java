@@ -8,10 +8,13 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -34,13 +37,6 @@ import frc.robot.commands.EverythingToHome;
 import frc.robot.commands.algaeclaw.AlgaeClawRunRollersIn;
 import frc.robot.commands.algaeclaw.AlgaeClawRunRollersOut;
 import frc.robot.commands.algaeclaw.AlgaeClawToAngle;
-import frc.robot.commands.coralclaw.CoralClawCloseClaw;
-import frc.robot.commands.coralclaw.CoralClawOpenClaw;
-import frc.robot.commands.coralclaw.CoralClawRunRollersOut;
-import frc.robot.commands.coralclaw.CoralClawToAngle;
-import frc.robot.commands.coralintake.CoralIntakeIntake;
-import frc.robot.commands.coralintake.CoralIntakeRetract;
-import frc.robot.commands.coralintake.CoralIntakeSpitOut;
 import frc.robot.commands.elevator.DisengageBrake;
 import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
@@ -81,12 +77,13 @@ public class RobotContainer
 
   public static final SendableChooser<TEST_MODES> TEST_MODE_CHOOSER = new SendableChooser<>();
   public static final SendableChooser<Songs> SONG_CHOOSER = new SendableChooser<>();
+  public static final SendableChooser<Command> AUTO_CHOOSER = new SendableChooser<>();
 
   public static final CANdi S_CARRIAGE_CANDI = new CANdi(RobotMap.ELEVATOR_CANDI_ID);
 
-  public static final Command CORAL_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new CoralClawOpenClaw(), new CoralIntakeIntake(), new CoralClawCloseClaw());
-  public static final Command ALGAE_INTAKE_SEQUENCE = new SequentialCommandGroup( new AlgaeClawRunRollersIn(), new WaitForBackAway(), new ClawsToPresetPosition(PresetClawPositions.kHome));
-  public static final Command CORRAL_SCORE_SEQUENCE = new SequentialCommandGroup(new ParallelDeadlineGroup(new WaitCommand(.2), new CoralClawRunRollersOut()), new WaitForBackAway(), new ClawsToPresetPosition(PresetClawPositions.kHome)); 
+  //public static final Command CORAL_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new CoralClawOpenClaw(), new CoralIntakeIntake(), new CoralClawCloseClaw());
+  //public static final Command ALGAE_INTAKE_SEQUENCE = new SequentialCommandGroup( new AlgaeClawRunRollersIn(), new WaitForBackAway(), new ClawsToPresetPosition(PresetClawPositions.kHome));
+  //public static final Command CORRAL_SCORE_SEQUENCE = new SequentialCommandGroup(new ParallelDeadlineGroup(new WaitCommand(.2), new CoralClawRunRollersOut()), new WaitForBackAway(), new ClawsToPresetPosition(PresetClawPositions.kHome)); 
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
@@ -137,6 +134,9 @@ public class RobotContainer
   () -> driverXbox.getRightY() * -1), snapAnglesHelper.getYDoubleSupplier(() ->driverXbox.getRightX() * -1,
   () -> driverXbox.getRightY() * -1)).headingWhile(true);
 
+  SwerveInputStream driveDirectAngleSlow = driveAngularVelocity.copy().scaleTranslation(.5).withControllerHeadingAxis(snapAnglesHelper.getXDoubleSupplier(() ->driverXbox.getRightX() * -1,
+  () -> driverXbox.getRightY() * -1), snapAnglesHelper.getYDoubleSupplier(() ->driverXbox.getRightX() * -1,
+  () -> driverXbox.getRightY() * -1)).headingWhile(true);
 
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
@@ -144,6 +144,8 @@ public class RobotContainer
   // left stick controls translation
   // right stick controls the desired angle NOT angular rotation
   Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+
+  Command driveFieldOrientedDirectAngleCrawl = drivebase.driveFieldOriented(driveDirectAngleSlow);
 
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
@@ -170,6 +172,8 @@ public class RobotContainer
 
   Command driveSetpointGenSim = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleSim);
 
+  Command driveSpeen = drivebase.driveSpeen(driveAngularVelocity, new Translation2d(-Units.inchesToMeters(14), 0));
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -189,11 +193,21 @@ public class RobotContainer
     for (Songs song: Songs.values())
     {
       SONG_CHOOSER.addOption(song.name(), song);
+
     }
     SmartDashboard.putData("Song", SONG_CHOOSER);
 
+
+    SmartDashboard.putData("Auto", AUTO_CHOOSER);
     Elevator.GetInstance().addToOrchestra(orchestra);
     drivebase.addToOrchestra(orchestra);
+
+    //AUTO MODES ADD HERE
+    AUTO_CHOOSER.addOption("Mobility", drivebase.getAutonomousCommand("Mobility"));
+    AUTO_CHOOSER.addOption("CenterL1", drivebase.getAutonomousCommand("SinglePiece"));
+    AUTO_CHOOSER.addOption("Nothing", new WaitCommand(15));
+    AUTO_CHOOSER.addOption("LeftL1", drivebase.getAutonomousCommand("LeftSideSingle"));
+    AUTO_CHOOSER.addOption("RightL1", drivebase.getAutonomousCommand("RightSideSingle"));
   }
 
   /**
@@ -234,18 +248,18 @@ public class RobotContainer
             break;
           case CoralClawAngleTest:
             Command coralClawSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
-            driverXbox.a().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(0.0)));
+            /*driverXbox.a().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(0.0)));
             driverXbox.b().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(120.0)));
-            driverXbox.y().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(180.0)));
+            driverXbox.y().onTrue(coralClawSetupBase.andThen(new CoralClawToAngle(180.0)));*/
             break;
           case CoralClawOpenCloseTest:
-            Command coralClawOpenSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
+            /*Command coralClawOpenSetupBase = new ClawsToPresetPosition(PresetClawPositions.kClawMotionTest);
             driverXbox.a().onTrue(coralClawOpenSetupBase.andThen(new CoralClawOpenClaw()));
-            driverXbox.b().onTrue(coralClawOpenSetupBase.andThen(new CoralClawCloseClaw()));
+            driverXbox.b().onTrue(coralClawOpenSetupBase.andThen(new CoralClawCloseClaw()));*/
             break;
           case CoralIntakeArmTest:
-            driverXbox.a().onTrue(new CoralIntakeIntake());
-            driverXbox.b().onTrue(new CoralIntakeRetract());
+            //driverXbox.a().onTrue(new CoralIntakeIntake());
+            //driverXbox.b().onTrue(new CoralIntakeRetract());
             break;
           case ElevatorBrakeTest:
             driverXbox.a().onTrue(new EngageBrakeAtDesiredPosition());
@@ -305,6 +319,8 @@ public class RobotContainer
       //driverXbox.b().whileTrue(
           //drivebase.driveToPose(()->ReefscapePointsHelper.getProcessorPose()));
       driverXbox.start().onTrue(new ClawsToPresetPosition(PresetClawPositions.kHome));
+      driverXbox.rightBumper().whileTrue(driveSpeen); 
+      /*
       driverXbox.rightBumper().and(driverXbox.a()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeL2));
       driverXbox.rightBumper().negate().and(driverXbox.a()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL2));
       driverXbox.rightBumper().and(driverXbox.b()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeL3));
@@ -314,12 +330,16 @@ public class RobotContainer
       driverXbox.rightBumper().and(driverXbox.x()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kAlgaeProcessBackward));
       driverXbox.rightBumper().negate().and(driverXbox.x()).onTrue(new ClawsToPresetPosition(PresetClawPositions.kCoralL1));
 
-      driverXbox.rightTrigger().whileTrue(new CoralIntakeIntake());
-
+      */
+      //driverXbox.rightTrigger().whileTrue(new CoralIntakeIntake());
+      operatorXbox.y().onTrue(new ElevatorToHeight(PresetClawPositions.kClimbPart1.getElevatorHeight()));
+      operatorXbox.a().onTrue(new ElevatorToHeight(PresetClawPositions.kHome.getElevatorHeight()).andThen(new EngageBrakeAtDesiredPosition()));
+      operatorXbox.b().onTrue(new DisengageBrake());
+      driverXbox.a().whileTrue(driveFieldOrientedDirectAngleCrawl);
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       new Trigger(drivebase::isPanicSituation).onTrue(new EverythingToHome());
       driverXbox.povRight().whileTrue(new GetAndRunCommand(pointsHelper::getProcessorPathCommand));
-      operatorXbox.a().whileTrue(new CoralIntakeSpitOut());
+      //operatorXbox.a().whileTrue(new CoralIntakeSpitOut());
       operatorXbox.start().onTrue(new EverythingToHome());
       
 
@@ -334,10 +354,13 @@ public class RobotContainer
     NamedCommands.registerCommand("L2Coral", new ClawsToPresetPosition(PresetClawPositions.kCoralL2));
     NamedCommands.registerCommand("L3Algae", new ClawsToPresetPosition(PresetClawPositions.kAlgaeL3));
     NamedCommands.registerCommand("L2Algae", new ClawsToPresetPosition(PresetClawPositions.kAlgaeL2));
-    NamedCommands.registerCommand("CoralIntake", CORAL_INTAKE_SEQUENCE);
+    //NamedCommands.registerCommand("CoralIntake", CORAL_INTAKE_SEQUENCE);
     NamedCommands.registerCommand("AlgaeClawIn", new AlgaeClawRunRollersIn());
-    NamedCommands.registerCommand("AlgaeOut", new ParallelDeadlineGroup(new WaitCommand(200),new AlgaeClawRunRollersOut()));
-    NamedCommands.registerCommand("CoralOut", new ParallelDeadlineGroup(new WaitCommand(200),new CoralClawRunRollersOut()));
+    NamedCommands.registerCommand("AlgaeOut", new ParallelDeadlineGroup(new WaitCommand(.2),new AlgaeClawRunRollersOut()));
+    //NamedCommands.registerCommand("CoralOut", new ParallelDeadlineGroup(new WaitCommand(.2),new CoralClawRunRollersOut()));
+    //NamedCommands.registerCommand("CoralScore", CORRAL_SCORE_SEQUENCE);
+    NamedCommands.registerCommand("WaitForMove", new WaitForBackAway());
+    NamedCommands.registerCommand("FiveSecondWait", new WaitCommand(5.0));
     NamedCommands.registerCommand(null, closedAbsoluteDriveAdv);
   }
 
@@ -348,10 +371,11 @@ public class RobotContainer
    */
   public Command getAutonomousCommand()
   {
-    
-    
-    // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("GroundPickup");
+    if(AUTO_CHOOSER.getSelected() != null)
+    {
+      return AUTO_CHOOSER.getSelected();
+    }
+    return drivebase.getAutonomousCommand("Mobility");
   }
 
   public void setDriveMode()

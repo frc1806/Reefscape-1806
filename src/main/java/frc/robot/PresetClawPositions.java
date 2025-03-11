@@ -7,20 +7,20 @@ package frc.robot;
 /** Add your docs here. */
 public enum PresetClawPositions {
     kHome(6.75, 0.0, 0.0),
-    kAlgaeNetForward(75.0, 0.0, 135.0),
-    kAlgaeNetBackward(75.0, 0.0, 45.0),
+    kAlgaeNetForward(65.0, 0.0, 135.0),
+    kAlgaeNetBackward(65.0, 0.0, 45.0),
     kAlgaeProcessForward(45.0, 0.0, 200.0),
     kAlgaeProcessBackward(0, 0.0, 10.0),
     kAlgaeL3(43.7, 0.0, 200.0),
     kAlgaeL2(35.8, 0.0, 200.0),
-    kCoralL4(75.0, 120.0, 0.0),
+    kCoralL4(65.0, 120.0, 0.0),
     kCoralL3(50.0, 150.0, 0.0),
     kCoralL2(34.0, 150.0, 0.0),
     kCoralL1(25, 180.0, 0.0),
     kClawMotionTest(50.0, 0.0, 0.0),
 
-    kClimbPart1(21.0, 0.0, 180.0),
-    kClimbPart2(0, 0.0, 80.0);
+    kClimbPart1(42.0, 0.0, 180.0),
+    kClimbPart2(7.5, 0.0, 80.0);
     
     
 

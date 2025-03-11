@@ -53,6 +53,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveInputStream;
 import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
@@ -828,5 +829,12 @@ public class SwerveSubsystem extends SubsystemBase
       module.getDriveMotor().set(0.0);
       module.getAngleMotor().set(0.0);
     }
+  }
+
+  public Command driveSpeen(SwerveInputStream driveAngularVelocity, Translation2d translation2d) {
+    return run(() -> {
+      swerveDrive.driveFieldOriented(driveAngularVelocity.get(), translation2d);
+      
+    });
   }
 }

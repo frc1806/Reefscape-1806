@@ -57,6 +57,7 @@ public class AlgaeClaw extends SubsystemBase{
         clawEncoderConfig.startPulseUs(1.0);
         clawEncoderConfig.endPulseUs(1024.0);
         clawEncoderConfig.inverted(false);
+        clawEncoderConfig.zeroCentered(true);
         mTargetAngle = 0;
 
         //configure closed loop control of intake arm

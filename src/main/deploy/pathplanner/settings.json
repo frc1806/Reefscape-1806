@@ -3,7 +3,9 @@
   "robotLength": 0.8636,
   "holonomicMode": true,
   "pathFolders": [
-    "GroundPickupAuto"
+    "GroundPickupAuto",
+    "RightSinglePieceSide",
+    "Single Piece Side"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.1,

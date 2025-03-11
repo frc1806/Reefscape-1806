@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
@@ -35,7 +36,7 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase{
     private static final boolean IS_ELEVATOR_ENABLED = true;
-    private TalonFX mElevator1, mElevator2;
+    private TalonFX mElevator1, mElevator2, mElevator3;
     private double mWantedHeight;
     private ElevatorSim mElevatorSim;
     private Servo mBrakeServo;
@@ -52,18 +53,23 @@ public class Elevator extends SubsystemBase{
         mWantedHeight = ElevatorConstants.ELEVATOR_MIN_HEIGHT;
         mElevator1 = new TalonFX(RobotMap.ELEVATOR_MOTOR_1);
         mElevator2 = new TalonFX(RobotMap.ELEVATOR_MOTOR_2);
+        mElevator3 = new TalonFX(RobotMap.ELEVATOR_MOTOR_3);
 
         mElevator1.setNeutralMode(NeutralModeValue.Brake);
         mElevator2.setNeutralMode(NeutralModeValue.Brake);
+        mElevator3.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfigurator motor1Configurator = mElevator1.getConfigurator();
         TalonFXConfigurator motor2Configurator = mElevator2.getConfigurator();
+        TalonFXConfigurator motor3Configurator = mElevator3.getConfigurator();
+
 
         var motorCurrent = new CurrentLimitsConfigs();
-        motorCurrent.StatorCurrentLimit = 160;
-        motorCurrent.SupplyCurrentLimit = 70;
+        motorCurrent.StatorCurrentLimit = 180;
+        motorCurrent.SupplyCurrentLimit = 90;
         motor1Configurator.apply(motorCurrent);
         motor2Configurator.apply(motorCurrent);
+        motor3Configurator.apply(motorCurrent);
 
         var Slot0Configs = new Slot0Configs();
         Slot0Configs.kP = 2.5;
@@ -103,9 +109,9 @@ public class Elevator extends SubsystemBase{
         motor1Configurator.apply(softLimitConfigs);
 
         final DutyCycleOut stopRequest = new DutyCycleOut(0);
-
+        mElevator2.setControl(new Follower(mElevator1.getDeviceID(), false));
+        mElevator3.setControl(new Follower(mElevator1.getDeviceID(), true));
         
-        mElevator2.setControl(new StrictFollower(mElevator1.getDeviceID()));
 
 
         mElevator1.setControl(stopRequest);

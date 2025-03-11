@@ -4,7 +4,8 @@ public class RobotMap {
     //ELEVATOR
     public static final int ELEVATOR_MOTOR_1 = 10; //Kraken (TalonFX)
     public static final int ELEVATOR_MOTOR_2 = 11; //Kraken (TalonFX)
-    public static final int ELEVATOR_CANDI_ID = 12; //not a motor
+    public static final int ELEVATOR_MOTOR_3 = 12;
+    public static final int ELEVATOR_CANDI_ID = 15; //not a motor
 
     //CORAL CLAW
     public static final int CORAL_CLAW_ROLLER_ID = 20; //Kraken (TalonFX)
