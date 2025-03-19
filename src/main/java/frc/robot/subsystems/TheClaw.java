@@ -9,16 +9,20 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -28,28 +32,29 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AlgaeClawConstants;
+import frc.robot.Constants.TheClawConstants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotMap;
 
-public class AlgaeClaw extends SubsystemBase{
+public class TheClaw extends SubsystemBase{
 
-    private static final AlgaeClaw S_INSTANCE = new AlgaeClaw();
+    private static final TheClaw S_INSTANCE = new TheClaw();
 
-    public static AlgaeClaw GetInstance(){
+    public static TheClaw GetInstance(){
         return S_INSTANCE;
     }
 
 
-    private TalonFX mClawRollerMotor;
+    private SparkMax mClawRollerMotor;
     private SparkFlex mClawAngleMotor;
+    private SparkFlexSim mClawAngleMotorSim;
     private SingleJointedArmSim mArmSim;
     private SparkAbsoluteEncoderSim mEncoderSim;
     private double mTargetAngle;
-
-    private AlgaeClaw() {
-        mClawAngleMotor = new SparkFlex(RobotMap.ALGAE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
+    DCMotor mAngleMotorSim;
+    private TheClaw() {
+        mClawAngleMotor = new SparkFlex(RobotMap.THE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
         SparkBaseConfig clawAngleConfig = new SparkFlexConfig();
         AbsoluteEncoderConfig clawEncoderConfig = new AbsoluteEncoderConfig();
         //configure through bore encoder. We will Zero them in rev's hardware client.
@@ -62,39 +67,33 @@ public class AlgaeClaw extends SubsystemBase{
 
         //configure closed loop control of intake arm
         MAXMotionConfig clawMoveConfig = new MAXMotionConfig();
-        clawMoveConfig.allowedClosedLoopError(AlgaeClawConstants.MAXIMUM_ALLOWED_CLOSED_LOOP_ERROR);
-        clawMoveConfig.maxAcceleration(AlgaeClawConstants.MAX_MOTION_MAX_ACCELERATION);
-        clawMoveConfig.maxVelocity(AlgaeClawConstants.MAX_MOTION_MAX_VELOCITY);
+        clawMoveConfig.allowedClosedLoopError(TheClawConstants.MAXIMUM_ALLOWED_CLOSED_LOOP_ERROR);
+        clawMoveConfig.maxAcceleration(TheClawConstants.MAX_MOTION_MAX_ACCELERATION);
+        clawMoveConfig.maxVelocity(TheClawConstants.MAX_MOTION_MAX_VELOCITY);
         clawMoveConfig.positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal);
 
         ClosedLoopConfig armClosedLoopConfig = new ClosedLoopConfig();
-        armClosedLoopConfig.pid(AlgaeClawConstants.MOVING_P_GAIN, AlgaeClawConstants.MOVING_I_GAIN, AlgaeClawConstants.MOVING_D_GAIN, ClosedLoopSlot.kSlot0);
+        armClosedLoopConfig.pid(TheClawConstants.MOVING_P_GAIN, TheClawConstants.MOVING_I_GAIN, TheClawConstants.MOVING_D_GAIN, ClosedLoopSlot.kSlot0);
         armClosedLoopConfig.apply(clawMoveConfig);
 
         clawAngleConfig.apply(clawEncoderConfig);
         clawAngleConfig.apply(armClosedLoopConfig);
-        clawAngleConfig.smartCurrentLimit(AlgaeClawConstants.CLAW_ROTATION_CURRENT_LIMIT);
-        clawAngleConfig.inverted(AlgaeClawConstants.CLAW_INTAKE_ARM_INVERTED);
+        clawAngleConfig.smartCurrentLimit(TheClawConstants.CLAW_ROTATION_CURRENT_LIMIT);
+        clawAngleConfig.inverted(TheClawConstants.CLAW_INTAKE_ARM_INVERTED);
         clawAngleConfig.idleMode(IdleMode.kBrake);
         mClawAngleMotor.configure(clawAngleConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        mClawRollerMotor = new TalonFX(RobotMap.ALGAE_CLAW_ROLLER_MOTOR_ID);
-        TalonFXConfigurator intakeRollerConfigurator = mClawRollerMotor.getConfigurator();
-        CurrentLimitsConfigs intakeRollerCurrentConfigs = new CurrentLimitsConfigs();
-        intakeRollerCurrentConfigs.withSupplyCurrentLimit(AlgaeClawConstants.INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT);
-        intakeRollerCurrentConfigs.withStatorCurrentLimit(AlgaeClawConstants.INTAKE_ROLLER_STATOR_CURRENT_LIMIT);
+        mClawRollerMotor = new SparkMax(RobotMap.ALGAE_CLAW_ROLLER_MOTOR_ID, MotorType.kBrushless);
+        SparkBaseConfig rollerMotorConfig = new SparkMaxConfig().smartCurrentLimit(20);
+        mClawRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        TalonFXConfiguration mIntakeRollerConfig = new TalonFXConfiguration();
-        mIntakeRollerConfig.withCurrentLimits(intakeRollerCurrentConfigs);
-        MotorOutputConfigs rollerOutputConfig = new MotorOutputConfigs();
-        rollerOutputConfig.withInverted(AlgaeClawConstants.IS_INTAKE_ROLLER_INVERTED? InvertedValue.Clockwise_Positive:InvertedValue.CounterClockwise_Positive);
-        rollerOutputConfig.withNeutralMode(NeutralModeValue.Coast);
-        mIntakeRollerConfig.withMotorOutput(rollerOutputConfig);
-        intakeRollerConfigurator.apply(mIntakeRollerConfig);
-
-        mEncoderSim = new SparkAbsoluteEncoderSim(mClawAngleMotor);
+        mAngleMotorSim = DCMotor.getNeoVortex(1);
+        mClawAngleMotorSim = new SparkFlexSim(mClawAngleMotor, mAngleMotorSim);
+        mEncoderSim = mClawAngleMotorSim.getAbsoluteEncoderSim();
+        mEncoderSim.setPositionConversionFactor(360.0);
+        mEncoderSim.setVelocityConversionFactor(360.0);
 
         mArmSim = 
-        new SingleJointedArmSim(DCMotor.getNeoVortex(1), AlgaeClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, AlgaeClawConstants.ARM_MASS), AlgaeClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(360), true, 0.0, 0.0, 0.0);
+        new SingleJointedArmSim(mAngleMotorSim, TheClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, TheClawConstants.ARM_MASS), TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(270), true, 0.0, 0.0, 0.0);
     }
 
 
@@ -104,16 +103,20 @@ public class AlgaeClaw extends SubsystemBase{
 
     @Override
     public void simulationPeriodic(){
+        mClawAngleMotorSim.iterate((Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) * TheClawConstants.ARM_GEAR_RATIO) / 360.0, RobotController.getBatteryVoltage(), Robot.kDefaultPeriod);
+        mEncoderSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) / 360.0, Robot.kDefaultPeriod);
         mArmSim.setInput(mClawAngleMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
         mArmSim.update(Robot.kDefaultPeriod);
-        mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
-        mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
-        SmartDashboard.putNumber("AlgaeClaw/Simulation/SimAngle", getAngle());
+        // mClawAngleMotorSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
+        // mClawAngleMotorSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+        // mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
+        // mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
+        SmartDashboard.putNumber("TheClaw/Simulation/SimAngle", getAngle());
     }
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("AlgaeClaw/Angle", getAngle());
+        SmartDashboard.putNumber("TheClaw/Angle", getAngle());
     }
     public void goToPosition(double angle){
         mClawAngleMotor.getClosedLoopController().setReference(angle, ControlType.kMAXMotionPositionControl);
@@ -122,7 +125,11 @@ public class AlgaeClaw extends SubsystemBase{
 
     }
         public boolean isAtPosition(){
-           return Math.abs(getAngle() - mTargetAngle) < AlgaeClawConstants.ANGLE_TOLERANCE;
+           return Math.abs(getAngle() - mTargetAngle) < TheClawConstants.ANGLE_TOLERANCE;
+        }
+
+        public boolean isAtArbitraryPosition(double angle){
+            return Math.abs(getAngle() - angle) < TheClawConstants.ANGLE_TOLERANCE;
         }
         public double getAngle(){
 
@@ -131,7 +138,7 @@ public class AlgaeClaw extends SubsystemBase{
         }
         
     public void runRollersIn(){
-        mClawRollerMotor.setControl(new VoltageOut(AlgaeClawConstants.ALGAE_CLAW_ROLLER_IN_VOLTAGE));
+        mClawRollerMotor.setVoltage(TheClawConstants.THE_CLAW_ROLLER_IN_VOLTAGE);
     }
 
     public void stopRollers(){
@@ -139,6 +146,6 @@ public class AlgaeClaw extends SubsystemBase{
     }
 
     public void runRollersOut(){
-        mClawRollerMotor.setControl(new VoltageOut(AlgaeClawConstants.ALGAE_CLAW_ROLLER_OUT_VOLTAGE));
+        mClawRollerMotor.setVoltage(TheClawConstants.THE_CLAW_ROLLER_OUT_VOLTAGE);
     }
 }

@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase{
 
     private Elevator()
     {
-        mWantedHeight = ElevatorConstants.ELEVATOR_MIN_HEIGHT;
+        mWantedHeight = ElevatorConstants.ELEVATOR_START_HEIGHT;
         mElevator1 = new TalonFX(RobotMap.ELEVATOR_MOTOR_1);
         mElevator2 = new TalonFX(RobotMap.ELEVATOR_MOTOR_2);
         mElevator3 = new TalonFX(RobotMap.ELEVATOR_MOTOR_3);
@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase{
 
         var motionMagicConfigs = new MotionMagicConfigs();
         motionMagicConfigs.MotionMagicAcceleration = 600.0;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 200.0;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 60.0;
 
 
 
@@ -115,9 +115,9 @@ public class Elevator extends SubsystemBase{
 
 
         mElevator1.setControl(stopRequest);
-        //Values here are weird because we're simulating a cascade as just a really heavy 1 stage
-        mElevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2), ElevatorConstants.ELEVATOR_GEAR_RATIO, Units.lbsToKilograms(85), Units.inchesToMeters(ElevatorConstants.ELEVATOR_DRUM_DIAMETER/2.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MAX_HEIGHT/3.0), true, Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT/3.0));
-        mElevator1.setPosition(ElevatorConstants.ELEVATOR_MIN_HEIGHT);
+        mElevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2), ElevatorConstants.ELEVATOR_GEAR_RATIO, Units.lbsToKilograms(20), Units.inchesToMeters(ElevatorConstants.ELEVATOR_DRUM_DIAMETER/2.0), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MIN_HEIGHT), Units.inchesToMeters(ElevatorConstants.ELEVATOR_MAX_HEIGHT), true, Units.inchesToMeters(ElevatorConstants.ELEVATOR_START_HEIGHT));
+        mElevator1.setPosition(ElevatorConstants.ELEVATOR_START_HEIGHT);
+
 
         mBrakeServo = new Servo(9);
         disengageParkingBrake();
@@ -152,6 +152,11 @@ public class Elevator extends SubsystemBase{
      */
     public boolean isAtPosition(){
         return Math.abs(mWantedHeight - GetPosition()) < ElevatorConstants.ELEVATOR_HEIGHT_TOLERANCE && Math.abs(getVelocity()) < ElevatorConstants.ELEVATOR_SPEED_TOLERANCE;
+    }
+
+    public boolean isAtArbitraryPosition(double position)
+    {
+        return Math.abs(position - GetPosition()) < ElevatorConstants.ELEVATOR_HEIGHT_TOLERANCE && Math.abs(getVelocity()) < ElevatorConstants.ELEVATOR_SPEED_TOLERANCE;
     }
 
     /** 
@@ -196,17 +201,17 @@ public class Elevator extends SubsystemBase{
     public void simulationPeriodic()
     {
         mElevator1.getSimState().setSupplyVoltage(RobotController.getBatteryVoltage());
-        mElevatorSim.setInputVoltage(-mElevator1.getSimState().getMotorVoltage());
+        mElevatorSim.setInputVoltage(mElevator1.getSimState().getMotorVoltage());
         if(!isBrakeEngaged())
         {
             mElevatorSim.update(Robot.kDefaultPeriod);
         }
-        mElevator1.getSimState().setRotorVelocity(-Units.metersToInches(mElevatorSim.getVelocityMetersPerSecond()) * (ElevatorConstants.ELEVATOR_GEAR_RATIO / (ElevatorConstants.ELEVATOR_DRUM_DIAMETER * Math.PI)));
-        mElevator1.getSimState().setRawRotorPosition(-(Units.metersToInches(mElevatorSim.getPositionMeters()) -(ElevatorConstants.ELEVATOR_MIN_HEIGHT / ElevatorConstants.ELEVATOR_CASCADE_STAGES))* (ElevatorConstants.ELEVATOR_GEAR_RATIO / (ElevatorConstants.ELEVATOR_DRUM_DIAMETER * Math.PI)));
+        mElevator1.getSimState().setRotorVelocity(Units.metersToInches(mElevatorSim.getVelocityMetersPerSecond()) * (ElevatorConstants.ELEVATOR_GEAR_RATIO / (ElevatorConstants.ELEVATOR_DRUM_DIAMETER * Math.PI)));
+        mElevator1.getSimState().setRawRotorPosition((Units.metersToInches(mElevatorSim.getPositionMeters()) -(ElevatorConstants.ELEVATOR_START_HEIGHT / ElevatorConstants.ELEVATOR_CASCADE_STAGES))* (ElevatorConstants.ELEVATOR_GEAR_RATIO / (ElevatorConstants.ELEVATOR_DRUM_DIAMETER * Math.PI)));
         //mElevator1.setPosition(Units.metersToInches(mElevatorSim.getPositionMeters() * 3.0)); //Convert to cascade by multiplying by 3
-        SmartDashboard.putNumber("Elevator/Simulation/SimElevatorHeight", Units.metersToInches(3.0 * mElevatorSim.getPositionMeters()));
+        SmartDashboard.putNumber("Elevator/Simulation/SimElevatorHeight", Units.metersToInches(mElevatorSim.getPositionMeters()));
         SmartDashboard.putNumber("Elevator/Simulation/CurrentDraw", mElevatorSim.getCurrentDrawAmps());
-        SmartDashboard.putNumber("Elevator/Simulation/ElevatorVelocity", Units.metersToInches(3.0 * mElevatorSim.getVelocityMetersPerSecond()));
+        SmartDashboard.putNumber("Elevator/Simulation/ElevatorVelocity", Units.metersToInches(mElevatorSim.getVelocityMetersPerSecond()));
 
     }
 
@@ -228,5 +233,10 @@ public class Elevator extends SubsystemBase{
         SmartDashboard.putBoolean("Elevator/IsBrakeEngaged", isBrakeEngaged());
         SmartDashboard.putBoolean("Elevator/IsBrakeDisengaged", isBrakeDisengaged());
     }
+
+	public void GetAngle() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'GetAngle'");
+	}
 
 }

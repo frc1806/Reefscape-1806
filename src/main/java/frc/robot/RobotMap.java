@@ -18,7 +18,7 @@ public class RobotMap {
 
     //ALGAE CLAW
 
-    public static final int ALGAE_CLAW_ANGLE_MOTOR_ID = 41;  //NEO Vortex (Spark Flex)
+    public static final int THE_CLAW_ANGLE_MOTOR_ID = 41;  //NEO Vortex (Spark Flex)
     public static final int ALGAE_CLAW_ROLLER_MOTOR_ID = 40; //Kraken (TalonFX)
 
     //ALGAE INTAKE

@@ -5,11 +5,11 @@ import frc.robot.RobotMap;
 
 public class CoralIntake extends MotorizedArmIntake{
 
-    //private static final CoralIntake S_INSTANCE = new CoralIntake();
+    private static final CoralIntake S_INSTANCE = new CoralIntake();
 
-    //public static CoralIntake GetInstance(){
-     //   return S_INSTANCE;
-    //}
+    public static CoralIntake GetInstance(){
+       return S_INSTANCE;
+    }
 
     private CoralIntake(){
         super();

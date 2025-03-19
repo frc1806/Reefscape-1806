@@ -51,4 +51,9 @@ public class ReefscapePointsHelper {
         return mSwerve.driveToPose(new Pose2d(new Translation2d(11.566, 7.483), Rotation2d.fromDegrees(90)));
      }
   }
+
+  public Command getNearestReefPathCommand() throws Exception
+  {
+    throw new Exception("Function getNearestReefPathCommand() NOT IMPLEMENTED YET"); //TODO: Implement
+  }
 }
