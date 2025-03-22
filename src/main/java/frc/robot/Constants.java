@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Voltage;
 import swervelib.math.Matter;
 
 /**
@@ -127,5 +128,11 @@ public final class Constants
     public static final double THE_CLAW_ANGLE_TOLERANCE = 1.5;
     public static final double ROLLER_IN_VOLTAGE = 8.0;
     public static final double ROLLER_OUT_VOLTAGE = -4.0;
+  }
+
+  public static class CoralFunnelConstants 
+  {
+    public static final double CORAL_FUNNEL_ROLLER_IN_VOLTAGE = 12;
+    public static final double CORAL_FUNNEL_ROLLER_OUT_VOLTAGE = -12;
   }
 }
