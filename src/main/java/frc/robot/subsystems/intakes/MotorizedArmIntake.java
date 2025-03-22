@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intakes;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -503,6 +504,10 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         SmartDashboard.putNumber(getIntakeName() + "/armMotorAppliedOutput", mIntakeArmMotor.getAppliedOutput());
         SmartDashboard.putNumber(getIntakeName() + "/rollerMotorOutputVolts", mIntakeRollerMotor.getMotorVoltage().getValueAsDouble());
         SmartDashboard.putNumber(getIntakeName() + "/armVelocity", mIntakeArmMotor.getAbsoluteEncoder().getVelocity());
+    }
+
+    public void addToOrchestra(Orchestra orchestra){
+        orchestra.addInstrument(mIntakeRollerMotor);
     }
 
 }

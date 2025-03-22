@@ -9,6 +9,7 @@ import java.util.Optional;
 /** Add your docs here. */
 public enum PresetClawPositions {
     kHome(22.0, 0.0),
+    kAlgaeHold(12.0, 150.0),
     kAlgaeIntake(22.0, 60.0),
     kAlgaeNetForward(49.0, 160.0),
     kAlgaeNetBackward(49.0, 200.0),
