@@ -93,11 +93,68 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": null
+                  "pathName": "FGL4"
                 }
               },
               {
                 "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReefBackAway"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CoralIntake"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FGL5"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4Coral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CoralScore"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FGL6"
+                }
+              },
+              {
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
