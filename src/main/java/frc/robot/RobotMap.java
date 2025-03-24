@@ -22,6 +22,5 @@ public class RobotMap {
     public static final int ALGAE_CLAW_ROLLER_MOTOR_ID = 40; //Kraken (TalonFX)
 
     //ALGAE INTAKE
-    public static final int ALGAE_INTAKE_ROLLER_ID = 50; //Kraken (TalonFX)
-    public static final int ALGAE_INTAKE_ARM_ID = 51; //NEO (Spark Max)
+    public static final int CORAL_FUNNEL_ROLLER_ID = 50; //Kraken (TalonFX)
 }
