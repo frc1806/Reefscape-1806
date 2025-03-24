@@ -4,6 +4,7 @@
   "holonomicMode": true,
   "pathFolders": [
     "GroundPickupAuto",
+    "FeederGroundLeft",
     "RightSinglePieceSide",
     "Single Piece Side"
   ],
@@ -20,8 +21,8 @@
   "driveGearing": 6.75,
   "maxDriveSpeed": 4.5,
   "driveMotorType": "krakenX60",
-  "driveCurrentLimit": 80.0,
-  "wheelCOF": 1.4,
+  "driveCurrentLimit": 70.0,
+  "wheelCOF": 1.1,
   "flModuleX": 0.2921,
   "flModuleY": 0.2921,
   "frModuleX": 0.2921,
@@ -33,8 +34,6 @@
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
   "robotFeatures": [
-    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":-0.125,\"y\":-0.25},\"size\":{\"width\":0.2,\"length\":0.5},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}",
-    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.25,\"y\":-0.25},\"size\":{\"width\":0.2,\"length\":0.3},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":true}}",
-    "{\"name\":\"Circle\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":0.1,\"y\":0.2},\"radius\":0.1905,\"strokeWidth\":0.02,\"filled\":true}}"
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.35,\"y\":0.0},\"size\":{\"width\":0.2,\"length\":0.4},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":true}}"
   ]
 }

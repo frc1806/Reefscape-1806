@@ -49,6 +49,7 @@ import frc.robot.commands.elevator.EngageBrakeAtDesiredPosition;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.swervedrive.WaitForBackAway;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDriveCurrentAngle;
 import frc.robot.commands.swervedrive.drivebase.StopDrive;
 import frc.robot.commands.utility.GetAndRunCommand;
 import frc.robot.subsystems.Elevator;
@@ -254,6 +255,7 @@ public class RobotContainer
     AUTO_CHOOSER.addOption("Nothing", new WaitCommand(15));
     AUTO_CHOOSER.addOption("LeftL1", drivebase.getAutonomousCommand("LeftSideSingle"));
     AUTO_CHOOSER.addOption("RightL1", drivebase.getAutonomousCommand("RightSideSingle"));
+    AUTO_CHOOSER.addOption("FeederGroundLeft", drivebase.getAutonomousCommand("FeederGroundLeft"));
   }
 
   /**
@@ -417,8 +419,8 @@ public class RobotContainer
     //NamedCommands.registerCommand("CoralOut", new ParallelDeadlineGroup(new WaitCommand(.2),new CoralClawRunRollersOut()));
     NamedCommands.registerCommand("CoralScore", GET_CORAL_SCORE_COMMAND());
     NamedCommands.registerCommand("ReefBackAway", GET_REEF_BACK_AWAY());
-    NamedCommands.registerCommand("WaitForMove", new WaitForBackAway());
     NamedCommands.registerCommand("FiveSecondWait", new WaitCommand(5.0));
+    NamedCommands.registerCommand("NoSpin", new AbsoluteFieldDriveCurrentAngle(drivebase, () -> 0.0, () -> 0.0)); //Add this to the end of your auto to make it not spin
     NamedCommands.registerCommand(null, closedAbsoluteDriveAdv);
   }
 

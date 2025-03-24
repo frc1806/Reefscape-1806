@@ -15,7 +15,6 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CoralFunnelConstants;
-import frc.robot.Constants.TheClawConstants;
 import frc.robot.RobotMap;
 
 public class CoralFunnel extends SubsystemBase {
