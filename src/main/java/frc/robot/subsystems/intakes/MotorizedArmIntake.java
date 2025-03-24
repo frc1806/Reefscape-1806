@@ -81,6 +81,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         armEncoderConfig.startPulseUs(1.0);
         armEncoderConfig.endPulseUs(1024.0);
         armEncoderConfig.inverted(isIntakeArmEncoderInverted());
+        armEncoderConfig.zeroCentered(true);
 
         //configure closed loop control of intake arm
         MAXMotionConfig armMoveConfig = new MAXMotionConfig();

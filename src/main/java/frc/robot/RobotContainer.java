@@ -35,6 +35,7 @@ import frc.robot.SnapAnglesHelper.FieldSnapAngles;
 import frc.robot.commands.ClawToPosition;
 import frc.robot.commands.EverythingToHome;
 import frc.robot.commands.claw.ClawScoreCommand;
+import frc.robot.commands.claw.ManualAngleClaw;
 import frc.robot.commands.claw.TheClawRunRollersIn;
 import frc.robot.commands.claw.TheClawRunRollersOut;
 import frc.robot.commands.claw.TheClawToAngle;
@@ -45,6 +46,7 @@ import frc.robot.commands.elevator.DisengageBrake;
 import frc.robot.commands.elevator.ElevatorMoveSequence;
 import frc.robot.commands.elevator.ElevatorToHeight;
 import frc.robot.commands.elevator.EngageBrakeAtDesiredPosition;
+import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.swervedrive.WaitForBackAway;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.commands.swervedrive.drivebase.StopDrive;
@@ -72,6 +74,7 @@ public class RobotContainer
     CoralClawAngleTest,
     CoralClawOpenCloseTest,
     AlgaeClawAngleTest,
+    ManualMove,
     PlayMusic
   }
 
@@ -90,23 +93,42 @@ public class RobotContainer
   //HACK HACK HACK
   public static PresetClawPositions S_MOST_RECENT_ACHIEVED_CLAW_POSITION = PresetClawPositions.kHome;
 
-  //public static final Command CORAL_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new CoralClawOpenClaw(), new CoralIntakeIntake(), new CoralClawCloseClaw());
-  public static final Command ALGAE_INTAKE_SEQUENCE = new SequentialCommandGroup(
-    new TheClawRunRollersIn(),
-    TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().holdAlgae()), 
-    new WaitForBackAway(), 
-    new ClawToPosition(PresetClawPositions.kAlgaeHold));
+  public static Command GET_ALGAE_INTAKE_SEQUENCE()
+  {
+    return new SequentialCommandGroup(
+      new TheClawRunRollersIn(),
+      TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().holdAlgae()), 
+      new WaitForBackAway(), 
+      new ClawToPosition(PresetClawPositions.kAlgaeHold));
+  }
 
-  public static final Command CORAL_SCORE_SEQUENCE = new SequentialCommandGroup(
-    new ClawScoreCommand(), 
-    new ParallelDeadlineGroup(
-        new WaitCommand(.1), 
-        TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().scoreCoral())), 
-    new ParallelDeadlineGroup(
-        new WaitForBackAway(),
-        TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().scoreCoral())),
-    TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().clearHeldGamePiece()), 
-    new ClawToPosition(PresetClawPositions.kHome)); 
+  public static Command GET_CORAL_SCORE_COMMAND()
+  {
+    return new SequentialCommandGroup(
+      new ClawScoreCommand(), 
+      new ParallelDeadlineGroup(
+          new WaitCommand(.1), 
+          TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().scoreCoral()))); 
+  }
+
+  //public static final Command CORAL_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new CoralClawOpenClaw(), new CoralIntakeIntake(), new CoralClawCloseClaw());
+
+  public static Command GET_REEF_BACK_AWAY()
+  {
+    return new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+          new WaitForBackAway(),
+          TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().scoreCoral())),
+      TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().clearHeldGamePiece()), 
+      new ClawToPosition(PresetClawPositions.kHome)
+    );
+  }
+
+  public static Command GET_CORAL_SCORE_SEQUENCE()
+  {
+    return GET_CORAL_SCORE_COMMAND().andThen(GET_REEF_BACK_AWAY());
+  }
+  
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
@@ -311,6 +333,9 @@ public class RobotContainer
             driverXbox.leftBumper().onTrue(Commands.none());
             driverXbox.rightBumper().onTrue(Commands.none());
             break;
+          case ManualMove:
+            setupManualElevatorArmBindings();
+            break;
           case PlayMusic:
             if(SONG_CHOOSER.getSelected() != null)
             {
@@ -344,11 +369,11 @@ public class RobotContainer
       //driverXbox.b().whileTrue(
           //drivebase.driveToPose(()->ReefscapePointsHelper.getProcessorPose()));
       driverXbox.start().onTrue(new ClawToPosition(PresetClawPositions.kHome));
-      driverXbox.leftTrigger().whileTrue(driveSpeen); 
+      driverXbox.leftBumper().whileTrue(driveSpeen); 
       
-      driverXbox.rightBumper().and(driverXbox.a()).onTrue(new ClawToPosition(PresetClawPositions.kAlgaeL2).andThen(ALGAE_INTAKE_SEQUENCE));
+      driverXbox.rightBumper().and(driverXbox.a()).onTrue(new ClawToPosition(PresetClawPositions.kAlgaeL2).andThen(GET_ALGAE_INTAKE_SEQUENCE()));
       driverXbox.rightBumper().negate().and(driverXbox.a()).onTrue(new ClawToPosition(PresetClawPositions.kCoralL2));
-      driverXbox.rightBumper().and(driverXbox.b()).onTrue(new ClawToPosition(PresetClawPositions.kAlgaeL3).andThen(ALGAE_INTAKE_SEQUENCE));
+      driverXbox.rightBumper().and(driverXbox.b()).onTrue(new ClawToPosition(PresetClawPositions.kAlgaeL3).andThen(GET_ALGAE_INTAKE_SEQUENCE()));
       driverXbox.rightBumper().negate().and(driverXbox.b()).onTrue(new ClawToPosition(PresetClawPositions.kCoralL3));
       driverXbox.rightBumper().and(driverXbox.y()).onTrue(new ClawToPosition(PresetClawPositions.kAlgaeNetForward));
       driverXbox.rightBumper().negate().and(driverXbox.y()).onTrue(new ClawToPosition(PresetClawPositions.kCoralL4));
@@ -361,15 +386,22 @@ public class RobotContainer
       operatorXbox.a().onTrue(new ElevatorToHeight(PresetClawPositions.kHome.getElevatorHeight()).andThen(new EngageBrakeAtDesiredPosition()));
       operatorXbox.b().onTrue(new DisengageBrake());
       driverXbox.a().whileTrue(driveFieldOrientedDirectAngleCrawl);
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverXbox.rightBumper().negate().and(driverXbox.leftTrigger()).onTrue(GET_CORAL_SCORE_SEQUENCE());
+      driverXbox.rightBumper().and(driverXbox.leftTrigger()).whileTrue(new TheClawRunRollersOut());
       new Trigger(drivebase::isPanicSituation).onTrue(new EverythingToHome());
       driverXbox.povRight().whileTrue(new GetAndRunCommand(pointsHelper::getProcessorPathCommand));
       //operatorXbox.a().whileTrue(new CoralIntakeSpitOut());
       //operatorXbox.start().onTrue(new EverythingToHome());
+      setupManualElevatorArmBindings();
       
 
     }
 
+  }
+
+  public void setupManualElevatorArmBindings(){
+    new Trigger(() -> -MathUtil.applyDeadband(operatorXbox.getLeftY(), 0.5, 1.0) != 0).whileTrue(new ManualElevator(() -> -MathUtil.applyDeadband(operatorXbox.getLeftY(), 0.15, 1.0)));
+    new Trigger(() -> -MathUtil.applyDeadband(operatorXbox.getRightY(), 0.5, 1.0) != 0).whileTrue(new ManualAngleClaw(() -> -MathUtil.applyDeadband(operatorXbox.getRightY(), 0.15, 1.0)));
   }
 
   public void setupNamedCommands(){
@@ -383,7 +415,8 @@ public class RobotContainer
     NamedCommands.registerCommand("AlgaeClawIn", new TheClawRunRollersIn());
     NamedCommands.registerCommand("AlgaeOut", new ParallelDeadlineGroup(new WaitCommand(.2),new TheClawRunRollersOut()));
     //NamedCommands.registerCommand("CoralOut", new ParallelDeadlineGroup(new WaitCommand(.2),new CoralClawRunRollersOut()));
-    NamedCommands.registerCommand("CoralScore", CORAL_SCORE_SEQUENCE);
+    NamedCommands.registerCommand("CoralScore", GET_CORAL_SCORE_COMMAND());
+    NamedCommands.registerCommand("ReefBackAway", GET_REEF_BACK_AWAY());
     NamedCommands.registerCommand("WaitForMove", new WaitForBackAway());
     NamedCommands.registerCommand("FiveSecondWait", new WaitCommand(5.0));
     NamedCommands.registerCommand(null, closedAbsoluteDriveAdv);

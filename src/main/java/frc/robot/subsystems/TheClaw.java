@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -67,9 +68,15 @@ public class TheClaw extends SubsystemBase{
     private TheClaw() {
         mClawAngleMotor = new SparkFlex(RobotMap.THE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
         SparkBaseConfig clawAngleConfig = new SparkFlexConfig();
+
+        EncoderConfig clawAngleInternalConfig = new EncoderConfig();
+        clawAngleInternalConfig.positionConversionFactor(360.0 / TheClawConstants.ARM_GEAR_RATIO);
+        clawAngleInternalConfig.velocityConversionFactor((360.0 / 60.0) / TheClawConstants.ARM_GEAR_RATIO);
+
         AbsoluteEncoderConfig clawEncoderConfig = new AbsoluteEncoderConfig();
         //configure through bore encoder. We will Zero them in rev's hardware client.
         clawEncoderConfig.positionConversionFactor(360);
+        clawEncoderConfig.velocityConversionFactor(360.0/60.0);
         clawEncoderConfig.startPulseUs(1.0);
         clawEncoderConfig.endPulseUs(1024.0);
         clawEncoderConfig.inverted(false);
@@ -87,6 +94,7 @@ public class TheClaw extends SubsystemBase{
         armClosedLoopConfig.pid(TheClawConstants.MOVING_P_GAIN, TheClawConstants.MOVING_I_GAIN, TheClawConstants.MOVING_D_GAIN, ClosedLoopSlot.kSlot0);
         armClosedLoopConfig.apply(clawMoveConfig);
 
+        clawAngleConfig.apply(clawAngleInternalConfig);
         clawAngleConfig.apply(clawEncoderConfig);
         clawAngleConfig.apply(armClosedLoopConfig);
         clawAngleConfig.smartCurrentLimit(TheClawConstants.CLAW_ROTATION_CURRENT_LIMIT);
@@ -118,21 +126,24 @@ public class TheClaw extends SubsystemBase{
 
     @Override
     public void simulationPeriodic(){
-        mClawAngleMotorSim.iterate((Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) * TheClawConstants.ARM_GEAR_RATIO) / 360.0, RobotController.getBatteryVoltage(), Robot.kDefaultPeriod);
-        mEncoderSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) / 360.0, Robot.kDefaultPeriod);
+        mClawAngleMotorSim.iterate((Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) * TheClawConstants.ARM_GEAR_RATIO), RobotController.getBatteryVoltage(), Robot.kDefaultPeriod);
+        mEncoderSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()), Robot.kDefaultPeriod);
         mArmSim.setInput(mClawAngleMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
         mArmSim.update(Robot.kDefaultPeriod);
         // mClawAngleMotorSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
         // mClawAngleMotorSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
         // mEncoderSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
         // mEncoderSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));
-        SmartDashboard.putNumber("TheClaw/Simulation/SimAngle", getAngle());
+        SmartDashboard.putNumber("TheClaw/Simulation/SimAngle", Units.radiansToDegrees(mArmSim.getAngleRads()));
         SmartDashboard.putString("TheClaw/GamePieceHeld", mCurrentGamePiece.name());
     }
 
     @Override
     public void periodic(){
         SmartDashboard.putNumber("TheClaw/Angle", getAngle());
+        SmartDashboard.putNumber("TheClaw/TargetAngle", mTargetAngle);
+        SmartDashboard.putNumber("TheClaw/AnglePower", mClawAngleMotor.getAppliedOutput());
+        SmartDashboard.putNumber("TheClaw/AngleCurrentDraw", mClawAngleMotor.getOutputCurrent());
         switch(mCurrentGamePiece){
             case kAlgae:
                 mClawRollerMotor.setVoltage(-12.0);
@@ -198,5 +209,9 @@ public class TheClaw extends SubsystemBase{
     public void runRollersOut(){
         mClawRollerMotor.setVoltage(TheClawConstants.THE_CLAW_ROLLER_OUT_VOLTAGE);
         clearHeldGamePiece();
+    }
+
+    public void manualArm(double value){
+        mClawAngleMotor.set(value);
     }
 }

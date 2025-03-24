@@ -72,20 +72,18 @@ public final class Constants
 
   public static class TheClawConstants
   {
-    public static final double MAXIMUM_ALLOWED_CLOSED_LOOP_ERROR = 0.0;
-    public static final double MAX_MOTION_MAX_ACCELERATION = 0.0;
-    public static final double MAX_MOTION_MAX_VELOCITY = 0.0;
-    public static final double MOVING_P_GAIN = 0.0;
+    public static final double MAXIMUM_ALLOWED_CLOSED_LOOP_ERROR = 1.25;
+    public static final double MAX_MOTION_MAX_ACCELERATION = 360.0;
+    public static final double MAX_MOTION_MAX_VELOCITY = 180.0;
+    public static final double MOVING_P_GAIN = 0.2;
     public static final double MOVING_I_GAIN = 0.0;
     public static final double MOVING_D_GAIN = 0.0;
-    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT = 0.0;
-    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT = 0.0;
     public static final boolean IS_INTAKE_ROLLER_INVERTED = false;
-    public static final int CLAW_ROTATION_CURRENT_LIMIT = 20;
+    public static final int CLAW_ROTATION_CURRENT_LIMIT = 60;
     public static final boolean CLAW_INTAKE_ARM_INVERTED = false;
     public static final double ARM_GEAR_RATIO = (38.0/18.0) * 5.0 * 5.0 * 3.0;
     public static final double ARM_CENTER_OF_MASS_DISTANCE = Units.inchesToMeters(20.0);
-    public static final double ARM_MASS = Units.lbsToKilograms(10);
+    public static final double ARM_MASS = Units.lbsToKilograms(7.5);
     public static final double ANGLE_TOLERANCE = 1.5;
     public static final double OVER_THE_TOP_ANGLE = 160.0;
 

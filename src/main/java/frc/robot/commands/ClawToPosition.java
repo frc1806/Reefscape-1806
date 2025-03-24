@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import javax.lang.model.util.ElementScanner14;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.PresetClawPositions;
 import frc.robot.RobotContainer;
@@ -65,6 +66,7 @@ public class ClawToPosition extends Command {
       Elevator.GetInstance().GoToPosition(getSafeElevatorRangeForClawAngle(TheClaw.GetInstance().getAngle()).getClosestToGoal(mGoalPosition.getElevatorHeight()));
       TheClaw.GetInstance().goToPosition(getSafeClawAngleRangeForElevatorHeight(Elevator.GetInstance().GetPosition()).getClosestToGoal(mGoalPosition.getTheClawAngle()));
     }
+    SmartDashboard.putBoolean("NeedsFlip", mNeedsFlip);
   
   }
 

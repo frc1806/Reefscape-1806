@@ -239,4 +239,8 @@ public class Elevator extends SubsystemBase{
 		throw new UnsupportedOperationException("Unimplemented method 'GetAngle'");
 	}
 
+    public void runManually(double value){
+        mElevator1.set(value);
+    }
+
 }
