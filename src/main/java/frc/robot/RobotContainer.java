@@ -39,6 +39,8 @@ import frc.robot.commands.claw.ManualAngleClaw;
 import frc.robot.commands.claw.TheClawRunRollersIn;
 import frc.robot.commands.claw.TheClawRunRollersOut;
 import frc.robot.commands.claw.TheClawToAngle;
+import frc.robot.commands.coralfunnel.RunCoralFunnelIn;
+import frc.robot.commands.coralfunnel.RunCoralFunnelOut;
 import frc.robot.commands.coralintake.CoralIntakeIntake;
 import frc.robot.commands.coralintake.CoralIntakeRetract;
 import frc.robot.commands.coralintake.CoralIntakeSpitOut;
@@ -52,6 +54,7 @@ import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDriveCurrentAngle;
 import frc.robot.commands.swervedrive.drivebase.StopDrive;
 import frc.robot.commands.utility.GetAndRunCommand;
+import frc.robot.subsystems.CoralFunnel;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.TheClaw;
 import frc.robot.subsystems.intakes.CoralIntake;
@@ -111,7 +114,9 @@ public class RobotContainer
           new WaitCommand(.1), 
           TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().scoreCoral()))); 
   }
-
+  public static Command GET_CORAL_TRANSFER_SEQUENCE(){
+     return new ParallelDeadlineGroup(new TheClawRunRollersIn(), new ClawToPosition(PresetClawPositions.kCoralTransfer));
+  }
   //public static final Command CORAL_INTAKE_SEQUENCE = new SequentialCommandGroup(new ClawsToPresetPosition(PresetClawPositions.kHome), new CoralClawOpenClaw(), new CoralIntakeIntake(), new CoralClawCloseClaw());
 
   public static Command GET_REEF_BACK_AWAY()
@@ -394,6 +399,10 @@ public class RobotContainer
       driverXbox.povRight().whileTrue(new GetAndRunCommand(pointsHelper::getProcessorPathCommand));
       //operatorXbox.a().whileTrue(new CoralIntakeSpitOut());
       //operatorXbox.start().onTrue(new EverythingToHome());
+      operatorXbox.povLeft().onTrue(GET_CORAL_TRANSFER_SEQUENCE());
+      operatorXbox.povUp().onTrue(new RunCoralFunnelIn());
+      operatorXbox.povDown().onTrue(new RunCoralFunnelOut());
+      new Trigger(() -> CoralFunnel.GetInstance().DoesCoralTrayHaveCoral() && TheClaw.GetInstance().isAtArbitraryPosition(PresetClawPositions.kHome.getTheClawAngle())).onTrue(GET_CORAL_TRANSFER_SEQUENCE());
       setupManualElevatorArmBindings();
       
 
@@ -421,6 +430,7 @@ public class RobotContainer
     NamedCommands.registerCommand("ReefBackAway", GET_REEF_BACK_AWAY());
     NamedCommands.registerCommand("FiveSecondWait", new WaitCommand(5.0));
     NamedCommands.registerCommand("NoSpin", new AbsoluteFieldDriveCurrentAngle(drivebase, () -> 0.0, () -> 0.0)); //Add this to the end of your auto to make it not spin
+    NamedCommands.registerCommand("CoralTransfer", GET_CORAL_TRANSFER_SEQUENCE());
     NamedCommands.registerCommand(null, closedAbsoluteDriveAdv);
   }
 
