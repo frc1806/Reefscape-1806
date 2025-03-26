@@ -454,7 +454,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
 
             case kRetracting:
                 //move the arm in with haste.
-                mIntakeRollerMotor.stopMotor();
+                mIntakeRollerMotor.set(-.1);
                 mIntakeArmMotor.getClosedLoopController().setReference(getIntakeArmAngleAtRest(), ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
                 if(Math.abs(armPosition - getIntakeArmAngleAtRest()) < getMaximumAllowedClosedLoopError()) {
                     mArmState = MotorizedIntakeArmState.kHoldingIn; //Switch to the lighter PID

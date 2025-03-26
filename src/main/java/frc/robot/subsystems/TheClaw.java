@@ -107,14 +107,19 @@ public class TheClaw extends SubsystemBase{
         rollerLimitSwitchConfig.forwardLimitSwitchEnabled(false).reverseLimitSwitchEnabled(false);
         rollerMotorConfig.apply(rollerLimitSwitchConfig);
         mClawRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        mAngleMotorSim = DCMotor.getNeoVortex(1);
-        mClawAngleMotorSim = new SparkFlexSim(mClawAngleMotor, mAngleMotorSim);
-        mEncoderSim = mClawAngleMotorSim.getAbsoluteEncoderSim();
-        mEncoderSim.setPositionConversionFactor(360.0);
-        mEncoderSim.setVelocityConversionFactor(360.0);
 
-        mArmSim = 
-        new SingleJointedArmSim(mAngleMotorSim, TheClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, TheClawConstants.ARM_MASS), TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(270), false, 0.0, 0.0, 0.0);
+        if(Robot.isSimulation())
+        {
+            mAngleMotorSim = DCMotor.getNeoVortex(1);
+            mClawAngleMotorSim = new SparkFlexSim(mClawAngleMotor, mAngleMotorSim);
+            mEncoderSim = mClawAngleMotorSim.getAbsoluteEncoderSim();
+            mEncoderSim.setPositionConversionFactor(360.0);
+            mEncoderSim.setVelocityConversionFactor(360.0);
+    
+            mArmSim = 
+            new SingleJointedArmSim(mAngleMotorSim, TheClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, TheClawConstants.ARM_MASS), TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(270), false, 0.0, 0.0, 0.0);
+        }
+
 
         mCurrentGamePiece = limitSwitchHit()?HeldGamePiece.kCoral:HeldGamePiece.kNothing;
     }
