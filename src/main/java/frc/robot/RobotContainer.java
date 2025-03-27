@@ -56,7 +56,8 @@ import frc.robot.commands.swervedrive.drivebase.StopDrive;
 import frc.robot.commands.utility.GetAndRunCommand;
 import frc.robot.subsystems.CoralFunnel;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.TheClaw;
+import frc.robot.subsystems.ClawAngler;
+import frc.robot.subsystems.ClawRoller;
 import frc.robot.subsystems.intakes.CoralIntake;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
@@ -101,7 +102,7 @@ public class RobotContainer
   {
     return new SequentialCommandGroup(
       new TheClawRunRollersIn(),
-      TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().holdAlgae()), 
+      ClawRoller.GetInstance().runOnce(() -> ClawRoller.GetInstance().holdAlgae()), 
       new WaitForBackAway(), 
       new ClawToPosition(PresetClawPositions.kAlgaeHold));
   }
@@ -112,7 +113,7 @@ public class RobotContainer
       new ClawScoreCommand(), 
       new ParallelDeadlineGroup(
           new WaitCommand(.1), 
-          TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().scoreCoral()))); 
+          ClawRoller.GetInstance().runOnce(() -> ClawRoller.GetInstance().scoreCoral()))); 
   }
   public static Command GET_CORAL_TRANSFER_SEQUENCE(){
      return new ParallelDeadlineGroup(new TheClawRunRollersIn(), new ClawToPosition(PresetClawPositions.kCoralTransfer));
@@ -124,8 +125,8 @@ public class RobotContainer
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
           new WaitForBackAway(),
-          TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().scoreCoral())),
-      TheClaw.GetInstance().runOnce(() -> TheClaw.GetInstance().clearHeldGamePiece()), 
+          ClawRoller.GetInstance().runOnce(() -> ClawRoller.GetInstance().scoreCoral())),
+      ClawRoller.GetInstance().runOnce(() -> ClawRoller.GetInstance().clearHeldGamePiece()), 
       new ClawToPosition(PresetClawPositions.kHome)
     );
   }
@@ -402,7 +403,7 @@ public class RobotContainer
       operatorXbox.povLeft().onTrue(GET_CORAL_TRANSFER_SEQUENCE());
       operatorXbox.povUp().onTrue(new RunCoralFunnelIn());
       operatorXbox.povDown().onTrue(new RunCoralFunnelOut());
-      new Trigger(() -> CoralFunnel.GetInstance().DoesCoralTrayHaveCoral() && TheClaw.GetInstance().isAtArbitraryPosition(PresetClawPositions.kHome.getTheClawAngle())).onTrue(GET_CORAL_TRANSFER_SEQUENCE());
+      new Trigger(() -> CoralFunnel.GetInstance().DoesCoralTrayHaveCoral() && ClawAngler.GetInstance().isAtArbitraryPosition(PresetClawPositions.kHome.getTheClawAngle())).onTrue(GET_CORAL_TRANSFER_SEQUENCE());
       setupManualElevatorArmBindings();
       
 

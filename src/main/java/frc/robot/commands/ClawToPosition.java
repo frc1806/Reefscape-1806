@@ -13,7 +13,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.TheClawConstants;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.TheClaw;
+import frc.robot.subsystems.ClawAngler;
 import swat.lib.Range;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -27,7 +27,7 @@ public class ClawToPosition extends Command {
   /** Creates a new ClawToPosition. */
   public ClawToPosition(PresetClawPositions clawPosition) {
     mGoalPosition = clawPosition;
-    addRequirements(Elevator.GetInstance(), TheClaw.GetInstance());
+    addRequirements(Elevator.GetInstance(), ClawAngler.GetInstance());
   }
 
   // Called when the command is initially scheduled.
@@ -35,7 +35,7 @@ public class ClawToPosition extends Command {
   public void initialize() {
     if(homeLimitClawHeightRange.isInRage(mGoalPosition.getElevatorHeight()))
     {
-      if(homeSafeAngleRange.isInRage(TheClaw.GetInstance().getAngle()) ^ homeSafeAngleRange.isInRage(mGoalPosition.getTheClawAngle()))
+      if(homeSafeAngleRange.isInRage(ClawAngler.GetInstance().getAngle()) ^ homeSafeAngleRange.isInRage(mGoalPosition.getTheClawAngle()))
       {
         mNeedsFlip = true;
       }
@@ -56,15 +56,15 @@ public class ClawToPosition extends Command {
     if(mNeedsFlip){
       //DO A FLIP
       Elevator.GetInstance().GoToPosition(ElevatorConstants.ELEVATOR_HEIGHT_FOR_SAFE_CLAW_MOVE + 2.0);
-      TheClaw.GetInstance().goToPosition(getSafeClawAngleRangeForElevatorHeight(Elevator.GetInstance().GetPosition()).getClosestToGoal(mGoalPosition.getTheClawAngle()));
-      if(Elevator.GetInstance().isAboveHeight(ElevatorConstants.CLAW_ANGLE_FOR_SAFE_ELEVATOR_MOVE) && homeUnsafeAngleRange.cmpRange(TheClaw.GetInstance().getAngle()) == homeUnsafeAngleRange.cmpRange(mGoalPosition.getTheClawAngle()))
+      ClawAngler.GetInstance().goToPosition(getSafeClawAngleRangeForElevatorHeight(Elevator.GetInstance().GetPosition()).getClosestToGoal(mGoalPosition.getTheClawAngle()));
+      if(Elevator.GetInstance().isAboveHeight(ElevatorConstants.CLAW_ANGLE_FOR_SAFE_ELEVATOR_MOVE) && homeUnsafeAngleRange.cmpRange(ClawAngler.GetInstance().getAngle()) == homeUnsafeAngleRange.cmpRange(mGoalPosition.getTheClawAngle()))
       {
         mNeedsFlip = false;
       }
     }
     else{
-      Elevator.GetInstance().GoToPosition(getSafeElevatorRangeForClawAngle(TheClaw.GetInstance().getAngle()).getClosestToGoal(mGoalPosition.getElevatorHeight()));
-      TheClaw.GetInstance().goToPosition(getSafeClawAngleRangeForElevatorHeight(Elevator.GetInstance().GetPosition()).getClosestToGoal(mGoalPosition.getTheClawAngle()));
+      Elevator.GetInstance().GoToPosition(getSafeElevatorRangeForClawAngle(ClawAngler.GetInstance().getAngle()).getClosestToGoal(mGoalPosition.getElevatorHeight()));
+      ClawAngler.GetInstance().goToPosition(getSafeClawAngleRangeForElevatorHeight(Elevator.GetInstance().GetPosition()).getClosestToGoal(mGoalPosition.getTheClawAngle()));
     }
     SmartDashboard.putBoolean("NeedsFlip", mNeedsFlip);
   
@@ -126,7 +126,7 @@ public class ClawToPosition extends Command {
       {
         default:
         case -1:
-        return new Range(TheClaw.GetInstance().getAngle(), TheClaw.GetInstance().getAngle());
+        return new Range(ClawAngler.GetInstance().getAngle(), ClawAngler.GetInstance().getAngle());
         case 0:
         return homeSafeAngleRange;
         case 1:
@@ -138,7 +138,7 @@ public class ClawToPosition extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Elevator.GetInstance().isAtArbitraryPosition(mGoalPosition.getElevatorHeight()) && TheClaw.GetInstance().isAtArbitraryPosition(mGoalPosition.getTheClawAngle());
+    return Elevator.GetInstance().isAtArbitraryPosition(mGoalPosition.getElevatorHeight()) && ClawAngler.GetInstance().isAtArbitraryPosition(mGoalPosition.getTheClawAngle());
   }
 
   

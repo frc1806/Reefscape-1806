@@ -76,10 +76,8 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         mIntakeConfig = new SparkMaxConfig();
         AbsoluteEncoderConfig armEncoderConfig = new AbsoluteEncoderConfig();
         //configure through bore encoder. We will Zero them in rev's hardware client.
-        armEncoderConfig.positionConversionFactor(360);
+        armEncoderConfig.positionConversionFactor(360.0);
         armEncoderConfig.velocityConversionFactor(360.0 / 60.0);
-        armEncoderConfig.startPulseUs(1.0);
-        armEncoderConfig.endPulseUs(1024.0);
         armEncoderConfig.inverted(isIntakeArmEncoderInverted());
         armEncoderConfig.zeroCentered(true);
 

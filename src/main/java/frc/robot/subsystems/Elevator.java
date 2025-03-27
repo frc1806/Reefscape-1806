@@ -63,7 +63,6 @@ public class Elevator extends SubsystemBase{
         TalonFXConfigurator motor2Configurator = mElevator2.getConfigurator();
         TalonFXConfigurator motor3Configurator = mElevator3.getConfigurator();
 
-
         var motorCurrent = new CurrentLimitsConfigs();
         motorCurrent.StatorCurrentLimit = 180;
         motorCurrent.SupplyCurrentLimit = 90;
@@ -97,7 +96,7 @@ public class Elevator extends SubsystemBase{
         MotorOutputConfigs outputConfigs = new MotorOutputConfigs();
         outputConfigs.withPeakForwardDutyCycle(1.0);
         outputConfigs.withPeakReverseDutyCycle(-1.0);
-        outputConfigs.withInverted(InvertedValue.CounterClockwise_Positive);
+        outputConfigs.withInverted(InvertedValue.Clockwise_Positive);
         motor1Configurator.apply(outputConfigs);
         
         SoftwareLimitSwitchConfigs softLimitConfigs  = new SoftwareLimitSwitchConfigs();

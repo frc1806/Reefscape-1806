@@ -7,14 +7,14 @@ package frc.robot.commands.claw;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.TheClaw;
+import frc.robot.subsystems.ClawAngler;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ManualAngleClaw extends Command {
   DoubleSupplier mInput;
   /** Creates a new ManualAngleClaw. */
   public ManualAngleClaw(DoubleSupplier input) {
-    addRequirements(TheClaw.GetInstance());
+    addRequirements(ClawAngler.GetInstance());
     mInput = input;
   }
 
@@ -25,13 +25,13 @@ public class ManualAngleClaw extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    TheClaw.GetInstance().manualArm(mInput.getAsDouble());
+    ClawAngler.GetInstance().manualArm(mInput.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    TheClaw.GetInstance().manualArm(0.0);
+    ClawAngler.GetInstance().manualArm(0.0);
   }
 
   // Returns true when the command should end.
