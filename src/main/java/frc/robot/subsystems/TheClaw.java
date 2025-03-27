@@ -107,14 +107,19 @@ public class TheClaw extends SubsystemBase{
         rollerLimitSwitchConfig.forwardLimitSwitchEnabled(false).reverseLimitSwitchEnabled(false);
         rollerMotorConfig.apply(rollerLimitSwitchConfig);
         mClawRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        mAngleMotorSim = DCMotor.getNeoVortex(1);
-        mClawAngleMotorSim = new SparkFlexSim(mClawAngleMotor, mAngleMotorSim);
-        mEncoderSim = mClawAngleMotorSim.getAbsoluteEncoderSim();
-        mEncoderSim.setPositionConversionFactor(360.0);
-        mEncoderSim.setVelocityConversionFactor(360.0);
 
-        mArmSim = 
-        new SingleJointedArmSim(mAngleMotorSim, TheClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, TheClawConstants.ARM_MASS), TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(270), true, 0.0, 0.0, 0.0);
+        if(Robot.isSimulation())
+        {
+            mAngleMotorSim = DCMotor.getNeoVortex(1);
+            mClawAngleMotorSim = new SparkFlexSim(mClawAngleMotor, mAngleMotorSim);
+            mEncoderSim = mClawAngleMotorSim.getAbsoluteEncoderSim();
+            mEncoderSim.setPositionConversionFactor(360.0);
+            mEncoderSim.setVelocityConversionFactor(360.0);
+    
+            mArmSim = 
+            new SingleJointedArmSim(mAngleMotorSim, TheClawConstants.ARM_GEAR_RATIO, SingleJointedArmSim.estimateMOI(TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, TheClawConstants.ARM_MASS), TheClawConstants.ARM_CENTER_OF_MASS_DISTANCE, 0, Units.degreesToRadians(270), false, 0.0, 0.0, 0.0);
+        }
+
 
         mCurrentGamePiece = limitSwitchHit()?HeldGamePiece.kCoral:HeldGamePiece.kNothing;
     }
@@ -126,9 +131,9 @@ public class TheClaw extends SubsystemBase{
 
     @Override
     public void simulationPeriodic(){
-        mClawAngleMotorSim.iterate((Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) * TheClawConstants.ARM_GEAR_RATIO), RobotController.getBatteryVoltage(), Robot.kDefaultPeriod);
-        mEncoderSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()), Robot.kDefaultPeriod);
-        mArmSim.setInput(mClawAngleMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+        mClawAngleMotorSim.iterate((Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) * TheClawConstants.ARM_GEAR_RATIO * 55.0), RobotController.getBatteryVoltage(), Robot.kDefaultPeriod);
+        mEncoderSim.iterate(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()) * 55.0, Robot.kDefaultPeriod);
+        mArmSim.setInput(mClawAngleMotor.getAppliedOutput() * 12.5);
         mArmSim.update(Robot.kDefaultPeriod);
         // mClawAngleMotorSim.setPosition(Units.radiansToDegrees(mArmSim.getAngleRads()));
         // mClawAngleMotorSim.setVelocity(Units.radiansToDegrees(mArmSim.getVelocityRadPerSec()));

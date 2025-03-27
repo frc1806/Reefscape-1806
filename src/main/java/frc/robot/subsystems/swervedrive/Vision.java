@@ -142,14 +142,22 @@ public class Vision
     }
     for (Cameras camera : Cameras.values())
     {
-      Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
-      if (poseEst.isPresent())
-      {
-        var pose = poseEst.get();
-        swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-                                         pose.timestampSeconds,
-                                         camera.curStdDevs);
+      try{
+        Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+        if (poseEst.isPresent())
+        {
+          var pose = poseEst.get();
+          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+                                           pose.timestampSeconds,
+                                           camera.curStdDevs);
+        }
       }
+      catch(Exception e)
+      {
+        //lol we don't care
+        System.out.println("Photonvision missing, probably.");
+      }
+
     }
 
   }
