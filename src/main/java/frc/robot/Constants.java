@@ -81,7 +81,7 @@ public final class Constants
     public static final double MOVING_D_GAIN = 0.0;
     public static final boolean IS_INTAKE_ROLLER_INVERTED = false;
     public static final int CLAW_ROTATION_CURRENT_LIMIT = 60;
-    public static final boolean CLAW_INTAKE_ARM_INVERTED = false;
+    public static final boolean CLAW_INTAKE_ARM_INVERTED = true;
     public static final double ARM_GEAR_RATIO = (38.0/18.0) * 5.0 * 5.0 * 3.0;
     public static final double ARM_CENTER_OF_MASS_DISTANCE = Units.inchesToMeters(15.0);
     public static final double ARM_MASS = Units.lbsToKilograms(7.5);

@@ -47,6 +47,7 @@ public class ClawAngler extends SubsystemBase{
     DCMotor mAngleMotorSim;
     private ClawAngler() {
         mClawAngleMotor = new SparkFlex(RobotMap.THE_CLAW_ANGLE_MOTOR_ID, MotorType.kBrushless);
+        
         SparkBaseConfig clawAngleConfig = new SparkFlexConfig();
 
         EncoderConfig clawAngleInternalConfig = new EncoderConfig();
