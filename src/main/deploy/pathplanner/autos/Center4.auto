@@ -5,19 +5,13 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "HoldCoral"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Center"
+                  "pathName": "CL4"
                 }
               },
               {
@@ -27,6 +21,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CL42"
           }
         },
         {
@@ -40,24 +40,18 @@
           "data": {
             "commands": [
               {
+                "type": "path",
+                "data": {
+                  "pathName": "CL43"
+                }
+              },
+              {
                 "type": "named",
                 "data": {
                   "name": "ReefBackAway"
                 }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Away"
-                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "NoSpin"
           }
         }
       ]

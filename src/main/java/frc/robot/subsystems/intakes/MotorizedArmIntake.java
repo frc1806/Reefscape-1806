@@ -356,6 +356,10 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
         }
     }
 
+    public void disable(){
+        mArmState = MotorizedIntakeArmState.kDisabled;
+    }
+
     /**
      * Move the intake to an arbitrary angle, does not spin rollers.
      * @param angle desired angle.
@@ -445,14 +449,14 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
                 //hold the arm in with the light PID
                 mIntakeRollerMotor.stopMotor();
                 mIntakeArmMotor.getClosedLoopController().setReference(getIntakeArmAngleAtRest(), ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot1);
-                if(armPosition - getIntakeArmAngleAtRest() >= getAcceptableHoldInAngleDeviation()){
+                if(armPosition - getIntakeArmAngleAtRest() >= getAcceptableHoldInAngleDeviation() * 2.0){
                     mArmState = MotorizedIntakeArmState.kRetracting; //Switch to the stronger PID
                 }
             break;
 
             case kRetracting:
                 //move the arm in with haste.
-                mIntakeRollerMotor.set(-.1);
+                mIntakeRollerMotor.set(-.4);
                 mIntakeArmMotor.getClosedLoopController().setReference(getIntakeArmAngleAtRest(), ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
                 if(Math.abs(armPosition - getIntakeArmAngleAtRest()) < getMaximumAllowedClosedLoopError()) {
                     mArmState = MotorizedIntakeArmState.kHoldingIn; //Switch to the lighter PID
@@ -460,7 +464,7 @@ public abstract class MotorizedArmIntake extends SubsystemBase{
             break;
             
             case kMovingToIntake:
-                mIntakeRollerMotor.setControl(new VoltageOut(mSpitOut?getIntakeRollerSpeedSpitOut():getIntakeRollerSpeedIntaking()));
+                mIntakeRollerMotor.setControl(new VoltageOut(mSpitOut?getIntakeRollerSpeedSpitOut():-6.0));
                 mIntakeArmMotor.getClosedLoopController().setReference(getIntakeArmAngleAtExtension(), ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
                 if(Math.abs(armPosition - getIntakeArmAngleAtExtension()) < getMaximumAllowedClosedLoopError()){
                     mArmState = MotorizedIntakeArmState.kHoldIntakeOut;

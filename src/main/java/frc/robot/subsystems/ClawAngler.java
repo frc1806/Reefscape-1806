@@ -13,6 +13,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -71,6 +72,7 @@ public class ClawAngler extends SubsystemBase{
 
         ClosedLoopConfig armClosedLoopConfig = new ClosedLoopConfig();
         armClosedLoopConfig.pid(TheClawConstants.MOVING_P_GAIN, TheClawConstants.MOVING_I_GAIN, TheClawConstants.MOVING_D_GAIN, ClosedLoopSlot.kSlot0);
+        armClosedLoopConfig.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         armClosedLoopConfig.apply(clawMoveConfig);
 
         clawAngleConfig.apply(clawAngleInternalConfig);
@@ -114,8 +116,8 @@ public class ClawAngler extends SubsystemBase{
         SmartDashboard.putNumber("TheClaw/TargetAngle", mTargetAngle);
         SmartDashboard.putNumber("TheClaw/AnglePower", mClawAngleMotor.getAppliedOutput());
         SmartDashboard.putNumber("TheClaw/AngleCurrentDraw", mClawAngleMotor.getOutputCurrent());
-        
     }
+    
     public void goToPosition(double angle){
         mClawAngleMotor.getClosedLoopController().setReference(angle, ControlType.kMAXMotionPositionControl);
         mTargetAngle = angle;

@@ -36,7 +36,7 @@ public class CoralFunnel extends SubsystemBase {
   public CoralFunnel() {
     mCoralFunnelRoller = new SparkMax(RobotMap.CORAL_FUNNEL_ROLLER_ID, MotorType.kBrushless);
     LimitSwitchConfig mCorrelFunneLimitSwitchConfig = new LimitSwitchConfig().forwardLimitSwitchEnabled(false).forwardLimitSwitchType(Type.kNormallyOpen);
-    SparkBaseConfig mCorralFunnelRollerConfig = new SparkMaxConfig().smartCurrentLimit(20).apply(mCorrelFunneLimitSwitchConfig);
+    SparkBaseConfig mCorralFunnelRollerConfig = new SparkMaxConfig().smartCurrentLimit(20).apply(mCorrelFunneLimitSwitchConfig).inverted(true);
     mCoralFunnelRoller.configure(mCorralFunnelRollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 

@@ -36,7 +36,7 @@ public class WaitForBackAway extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return RobotContainer.drivebase.getPose().getTranslation().getDistance(mInitialPose.getTranslation()) > Units.inchesToMeters(8.0);
+    return RobotContainer.drivebase.getPose().getTranslation().getDistance(mInitialPose.getTranslation()) > Units.inchesToMeters(6.0);
 
   }
 }

@@ -8,23 +8,24 @@ import java.util.Optional;
 
 /** Add your docs here. */
 public enum PresetClawPositions {
-    kHome(22.0, 0.0),
-    kCoralTransfer(20.0, 0.0),
+    kHome(29.0, 5.0),
+    kFeeder(32.0, 5.0),
+    kCoralTransfer(22.0, 0.0),
     kAlgaeHold(12.0, 150.0),
     kAlgaeIntake(22.0, 60.0),
-    kAlgaeNetForward(49.0, 160.0),
-    kAlgaeNetBackward(49.0, 200.0),
+    kAlgaeNetForward(45.0, 160.0),
+    kAlgaeNetBackward(45.0, 200.0),
     kAlgaeProcessForward(25.0, 60.0),
-    kAlgaeL3(49.0, 65.0),
+    kAlgaeL3(45.0, 65.0),
     kAlgaeL2(36.0, 65.0),
-    kCoralL4(49.0, 90.0, 85.0),
-    kCoralL3(18.0, 150.0, 140.0),
-    kCoralL2(18.0, 120.0, 115.0),
-    kCoralL1(40, 30.0),
-    kClawMotionTest(35.0, 0.0),
+    kCoralL4(42.2, 152.0, 123.0),
+    kCoralL3(21.5, 147.0, 123.0),
+    kCoralL2(15.5, 128.0, 100.0),
+    kCoralL1(40, 40.0),
+    kClawMotionTest(30.0, 0.0),
 
-    kClimbPart1(45.0, 0.0),
-    kClimbPart2(7.5, 0.0);
+    kClimbPart1(35.0, 0.0),
+    kClimbPart2(30.5, 0.0);
     
     
 

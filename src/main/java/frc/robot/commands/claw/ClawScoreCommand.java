@@ -24,7 +24,9 @@ public class ClawScoreCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    ClawAngler.GetInstance().goToPosition(RobotContainer.S_MOST_RECENT_ACHIEVED_CLAW_POSITION.getClawScoringAngle());
+  }
 
   // Called once the command ends or is interrupted.
   @Override

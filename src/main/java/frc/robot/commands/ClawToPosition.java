@@ -19,8 +19,8 @@ import swat.lib.Range;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ClawToPosition extends Command {
   private PresetClawPositions mGoalPosition;
-  private static final Range homeSafeAngleRange = new Range(-2.0, 10.0);
-  private static final Range homeUnsafeAngleRange = new Range(10.0000000001,100.0);
+  private static final Range homeSafeAngleRange = new Range(-5.0, 20.0);
+  private static final Range homeUnsafeAngleRange = new Range(20.0000000001,45.0);
   private static final Range homeLimitClawHeightRange = new Range(ElevatorConstants.ELEVATOR_MIN_HEIGHT, ElevatorConstants.ELEVATOR_HEIGHT_FOR_SAFE_CLAW_MOVE);
   private boolean mNeedsFlip = false;
 

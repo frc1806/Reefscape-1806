@@ -80,8 +80,8 @@ public class Elevator extends SubsystemBase{
         //Slot0Configs.kA = 0.009;
 
         var motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicAcceleration = 600.0;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 60.0;
+        motionMagicConfigs.MotionMagicAcceleration = 500.0;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 50.0;
 
 
 

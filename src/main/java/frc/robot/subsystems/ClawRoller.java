@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,9 +40,10 @@ private HeldGamePiece mCurrentGamePiece;
 
 public ClawRoller() {
     mClawRollerMotor = new SparkMax(RobotMap.ALGAE_CLAW_ROLLER_MOTOR_ID, MotorType.kBrushless);
-    SparkBaseConfig rollerMotorConfig = new SparkMaxConfig().smartCurrentLimit(15);
+    SparkBaseConfig rollerMotorConfig = new SparkMaxConfig().smartCurrentLimit(15).inverted(true);
     LimitSwitchConfig rollerLimitSwitchConfig = new LimitSwitchConfig();
     rollerLimitSwitchConfig.forwardLimitSwitchEnabled(false).reverseLimitSwitchEnabled(false);
+    rollerLimitSwitchConfig.reverseLimitSwitchType(Type.kNormallyOpen);
     rollerMotorConfig.apply(rollerLimitSwitchConfig);
     mClawRollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     mCurrentGamePiece = limitSwitchHit()?HeldGamePiece.kCoral:HeldGamePiece.kNothing;
@@ -92,12 +94,13 @@ public ClawRoller() {
   @Override
   public void periodic() {
       SmartDashboard.putString("TheClaw/GamePieceHeld", mCurrentGamePiece.name());
+      SmartDashboard.putBoolean("TheClaw/LimitSwitch", limitSwitchHit());
     switch(mCurrentGamePiece){
       case kAlgae:
           mClawRollerMotor.setVoltage(-12.0);
           break;
       case kCoral:
-          mClawRollerMotor.set(-.1);
+          mClawRollerMotor.set(-.05);
           break;
       default:
       case kNothing:
